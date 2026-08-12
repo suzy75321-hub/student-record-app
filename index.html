@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -384,251 +383,6 @@ let allData = [];
 let haengbalData = [];
 
 
-/* =====================================================
-   ★ 날짜 처리 함수
-   어떤 형태의 날짜가 와도 NaN이 나오지 않도록 처리
-===================================================== */
-
-function formatDate(value) {
-
-  /* 값이 아예 없는 경우 */
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return "";
-  }
-
-
-  /* 문자열로 변환 */
-  const raw = String(value).trim();
-
-
-  if (!raw) {
-    return "";
-  }
-
-
-  /* -----------------------------------------------
-     1. 한국어 날짜 형식
-
-     예:
-     2026. 8. 13 오전 4:17:15
-     2026. 8. 13 오후 2:30:00
-  ------------------------------------------------ */
-
-  let match = raw.match(
-    /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/
-  );
-
-  if (match) {
-
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-
-    if (
-      Number.isFinite(year) &&
-      Number.isFinite(month) &&
-      Number.isFinite(day)
-    ) {
-
-      return (
-        year +
-        ". " +
-        month +
-        ". " +
-        day +
-        "."
-      );
-
-    }
-  }
-
-
-  /* -----------------------------------------------
-     2. 하이픈 날짜
-
-     예:
-     2026-08-13
-     2026-08-13T04:17:15
-     2026-08-13T04:17:15.000Z
-  ------------------------------------------------ */
-
-  match = raw.match(
-    /(\d{4})-(\d{1,2})-(\d{1,2})/
-  );
-
-  if (match) {
-
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-
-    if (
-      Number.isFinite(year) &&
-      Number.isFinite(month) &&
-      Number.isFinite(day)
-    ) {
-
-      return (
-        year +
-        ". " +
-        month +
-        ". " +
-        day +
-        "."
-      );
-
-    }
-  }
-
-
-  /* -----------------------------------------------
-     3. 슬래시 날짜
-
-     예:
-     2026/8/13
-     2026/08/13
-  ------------------------------------------------ */
-
-  match = raw.match(
-    /(\d{4})\/(\d{1,2})\/(\d{1,2})/
-  );
-
-  if (match) {
-
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-
-    if (
-      Number.isFinite(year) &&
-      Number.isFinite(month) &&
-      Number.isFinite(day)
-    ) {
-
-      return (
-        year +
-        ". " +
-        month +
-        ". " +
-        day +
-        "."
-      );
-
-    }
-  }
-
-
-  /* -----------------------------------------------
-     4. 숫자로 된 Google Sheets 날짜값
-
-     Google Sheets 날짜가 숫자로 전달될 경우
-     1899-12-30 기준의 serial number로 처리
-  ------------------------------------------------ */
-
-  if (
-    typeof value === "number" &&
-    Number.isFinite(value)
-  ) {
-
-    const baseDate =
-      new Date(Date.UTC(1899, 11, 30));
-
-    const date =
-      new Date(
-        baseDate.getTime() +
-        value * 24 * 60 * 60 * 1000
-      );
-
-    if (!isNaN(date.getTime())) {
-
-      return (
-        date.getUTCFullYear() +
-        ". " +
-        (date.getUTCMonth() + 1) +
-        ". " +
-        date.getUTCDate() +
-        "."
-      );
-
-    }
-  }
-
-
-  /* -----------------------------------------------
-     5. 문자열이 숫자로 전달되는 경우
-  ------------------------------------------------ */
-
-  if (
-    /^(\d+)(\.\d+)?$/.test(raw)
-  ) {
-
-    const serial =
-      Number(raw);
-
-    if (Number.isFinite(serial)) {
-
-      const baseDate =
-        new Date(Date.UTC(1899, 11, 30));
-
-      const date =
-        new Date(
-          baseDate.getTime() +
-          serial * 24 * 60 * 60 * 1000
-        );
-
-      if (!isNaN(date.getTime())) {
-
-        return (
-          date.getUTCFullYear() +
-          ". " +
-          (date.getUTCMonth() + 1) +
-          ". " +
-          date.getUTCDate() +
-          "."
-        );
-
-      }
-    }
-  }
-
-
-  /* -----------------------------------------------
-     6. 마지막 안전장치
-
-     일반적인 날짜라면 Date로 변환
-  ------------------------------------------------ */
-
-  const date =
-    new Date(raw);
-
-  if (!isNaN(date.getTime())) {
-
-    return (
-      date.getFullYear() +
-      ". " +
-      (date.getMonth() + 1) +
-      ". " +
-      date.getDate() +
-      "."
-    );
-
-  }
-
-
-  /* -----------------------------------------------
-     7. 그래도 못 읽으면 원본 표시
-
-     ★ NaN 절대 출력하지 않음
-  ------------------------------------------------ */
-
-  return raw;
-}
-
-
 /* =========================
    페이지 이동
 ========================= */
@@ -746,10 +500,6 @@ function searchStudent() {
 
   records.forEach(record => {
 
-    const formattedDate =
-      formatDate(record["타임스탬프"]);
-
-
     html += `
       <div class="card">
 
@@ -762,7 +512,7 @@ function searchStudent() {
         </div>
 
         <div>
-          ${formattedDate}
+          ${record["타임스탬프"] || ""}
         </div>
 
         <div class="label">
@@ -799,6 +549,7 @@ function searchStudent() {
 
       </div>
     `;
+
   });
 
   area.innerHTML = html;
@@ -814,7 +565,8 @@ async function generateStudentRecord() {
   const resultArea =
     document.getElementById("aiResult");
 
-  resultArea.style.display = "block";
+  resultArea.style.display =
+    "block";
 
   resultArea.innerHTML =
     "✨ 생기부 표현을 만드는 중입니다...";
@@ -868,6 +620,7 @@ async function generateStudentRecord() {
 
 
     resultArea.innerHTML = `
+
       <div class="label">
         ✨ AI 생기부 표현
       </div>
@@ -879,6 +632,7 @@ async function generateStudentRecord() {
       ">
         ${data.result}
       </div>
+
     `;
 
 
@@ -1090,10 +844,6 @@ function showHaengbalStudent() {
 
   records.forEach((record, index) => {
 
-    const formattedDate =
-      formatDate(record["타임스탬프"]);
-
-
     const friendRelation =
       record["학급이나 학교에서 친구들과 어떻게 지냈나요?"] ||
       record["  학급이나 학교에서 친구들과 어떻게 지냈나요?  "] ||
@@ -1113,7 +863,7 @@ function showHaengbalStudent() {
         </div>
 
         <div>
-          ${formattedDate}
+          ${record["타임스탬프"] || ""}
         </div>
 
         <div class="label">
@@ -1295,4 +1045,3 @@ loadHaengbalData();
 
 </body>
 </html>
-```

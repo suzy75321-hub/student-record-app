@@ -174,7 +174,16 @@ function searchStudent() {
     "<div class='student-title'>" +
     studentKey +
     " 학생의 수업성찰 기록</div>";
+html += `
+  <button onclick="generateStudentRecord()" style="
+    margin-bottom:20px;
+    background:#16a34a;
+  ">
+    ✨ 생기부 표현 만들기
+  </button>
 
+  <div id="aiResult" class="card" style="display:none;"></div>
+`;
   records.forEach(record => {
 const date = new Date(record["타임스탬프"]);
 const formattedDate =
@@ -208,7 +217,67 @@ const formattedDate =
   area.innerHTML = html;
 }
 
+async function generateStudentRecord() {
 
+  const resultArea = document.getElementById("aiResult");
+
+  resultArea.style.display = "block";
+  resultArea.innerHTML = "✨ 생기부 표현을 만드는 중입니다...";
+
+  const className =
+    document.getElementById("classInput").value.trim();
+
+  const number =
+    document.getElementById("numberInput").value.trim();
+
+  const studentKey =
+    className + "-" + number;
+
+  const records = allData.filter(row => {
+    return String(row["검색키"]).trim() === studentKey;
+  });
+
+  if (records.length === 0) {
+    resultArea.innerHTML = "학생 기록이 없습니다.";
+    return;
+  }
+
+  try {
+
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        records: records
+      })
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "AI 생성에 실패했습니다.");
+    }
+
+    resultArea.innerHTML = `
+      <div class="label">✨ AI 생기부 표현</div>
+      <div style="
+        line-height:1.8;
+        margin-top:10px;
+        white-space:pre-wrap;
+      ">${data.result}</div>
+    `;
+
+  } catch (error) {
+
+    console.error(error);
+
+    resultArea.innerHTML =
+      "AI 생기부 표현을 만드는 중 오류가 발생했습니다.<br>" +
+      error.message;
+  }
+}
 loadData();
 
 </script>

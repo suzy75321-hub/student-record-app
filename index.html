@@ -165,6 +165,10 @@ button:hover {
   border-left: 5px solid #16a34a;
 }
 
+.loading {
+  color: #666;
+}
+
 @media (max-width: 600px) {
   .menu-grid {
     grid-template-columns: 1fr;
@@ -350,7 +354,7 @@ button:hover {
     <h2>⭐ 창체</h2>
 
     <p>
-      창의적 체험활동 성찰을 바탕으로<br>
+      창의적 체험활동 성찰 설문을 바탕으로<br>
       생활기록부 기록을 작성합니다.
     </p>
 
@@ -365,9 +369,9 @@ button:hover {
 
 <script>
 
-/* =====================================================
+/* =========================
    API 주소
-===================================================== */
+========================= */
 
 const API_URL =
 "https://script.google.com/macros/s/AKfycbx29VbzFJifdQdNVB54gJvev4y-1iNfmwte34n5Pj4QAbfmbakeDV4CazSZV57lHp5uyQ/exec";
@@ -382,11 +386,12 @@ let haengbalData = [];
 
 /* =====================================================
    ★ 날짜 처리 함수
-   여러 가지 날짜 형식을 모두 안전하게 처리
+   어떤 형태의 날짜가 와도 NaN이 나오지 않도록 처리
 ===================================================== */
 
 function formatDate(value) {
 
+  /* 값이 아예 없는 경우 */
   if (
     value === null ||
     value === undefined ||
@@ -396,57 +401,8 @@ function formatDate(value) {
   }
 
 
-  /* -----------------------------------------
-     1. 숫자로 들어오는 경우
-     Unix timestamp / 밀리초 처리
-  ----------------------------------------- */
-
-  if (typeof value === "number") {
-
-    const date =
-      new Date(value);
-
-    if (!isNaN(date.getTime())) {
-
-      return makeDateText(date);
-
-    }
-
-  }
-
-
-  /* -----------------------------------------
-     2. 객체로 들어오는 경우
-     ----------------------------------------- */
-
-  if (typeof value === "object") {
-
-    try {
-
-      const date =
-        new Date(value);
-
-      if (!isNaN(date.getTime())) {
-
-        return makeDateText(date);
-
-      }
-
-    } catch (e) {
-
-      console.log("날짜 객체 처리 실패:", e);
-
-    }
-
-  }
-
-
-  /* -----------------------------------------
-     3. 문자열 처리
-  ----------------------------------------- */
-
-  const raw =
-    String(value).trim();
+  /* 문자열로 변환 */
+  const raw = String(value).trim();
 
 
   if (!raw) {
@@ -454,263 +410,312 @@ function formatDate(value) {
   }
 
 
-  /* -----------------------------------------
-     3-1.
-     Google 설문에서 자주 오는 형식
-
-     2026. 8. 13 오전 4:17:15
-
-     날짜 부분만 직접 추출
-  ----------------------------------------- */
-
-  let match =
-    raw.match(
-      /(\d{4})\s*[./-]\s*(\d{1,2})\s*[./-]\s*(\d{1,2})/
-    );
-
-
-  if (match) {
-
-    return (
-      match[1] +
-      ". " +
-      Number(match[2]) +
-      ". " +
-      Number(match[3]) +
-      "."
-    );
-
-  }
-
-
-  /* -----------------------------------------
-     3-2.
-     ISO 날짜
+  /* -----------------------------------------------
+     1. 한국어 날짜 형식
 
      예:
-     2026-08-13T04:17:15.000Z
-     2026-08-13T04:17:15+09:00
-  ----------------------------------------- */
+     2026. 8. 13 오전 4:17:15
+     2026. 8. 13 오후 2:30:00
+  ------------------------------------------------ */
 
-  match =
-    raw.match(
-      /^(\d{4})-(\d{2})-(\d{2})/
-    );
-
+  let match = raw.match(
+    /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/
+  );
 
   if (match) {
 
-    return (
-      match[1] +
-      ". " +
-      Number(match[2]) +
-      ". " +
-      Number(match[3]) +
-      "."
-    );
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
 
+    if (
+      Number.isFinite(year) &&
+      Number.isFinite(month) &&
+      Number.isFinite(day)
+    ) {
+
+      return (
+        year +
+        ". " +
+        month +
+        ". " +
+        day +
+        "."
+      );
+
+    }
   }
 
 
-  /* -----------------------------------------
-     3-3.
-     일반 날짜 문자열
-  ----------------------------------------- */
+  /* -----------------------------------------------
+     2. 하이픈 날짜
+
+     예:
+     2026-08-13
+     2026-08-13T04:17:15
+     2026-08-13T04:17:15.000Z
+  ------------------------------------------------ */
+
+  match = raw.match(
+    /(\d{4})-(\d{1,2})-(\d{1,2})/
+  );
+
+  if (match) {
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    if (
+      Number.isFinite(year) &&
+      Number.isFinite(month) &&
+      Number.isFinite(day)
+    ) {
+
+      return (
+        year +
+        ". " +
+        month +
+        ". " +
+        day +
+        "."
+      );
+
+    }
+  }
+
+
+  /* -----------------------------------------------
+     3. 슬래시 날짜
+
+     예:
+     2026/8/13
+     2026/08/13
+  ------------------------------------------------ */
+
+  match = raw.match(
+    /(\d{4})\/(\d{1,2})\/(\d{1,2})/
+  );
+
+  if (match) {
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    if (
+      Number.isFinite(year) &&
+      Number.isFinite(month) &&
+      Number.isFinite(day)
+    ) {
+
+      return (
+        year +
+        ". " +
+        month +
+        ". " +
+        day +
+        "."
+      );
+
+    }
+  }
+
+
+  /* -----------------------------------------------
+     4. 숫자로 된 Google Sheets 날짜값
+
+     Google Sheets 날짜가 숫자로 전달될 경우
+     1899-12-30 기준의 serial number로 처리
+  ------------------------------------------------ */
+
+  if (
+    typeof value === "number" &&
+    Number.isFinite(value)
+  ) {
+
+    const baseDate =
+      new Date(Date.UTC(1899, 11, 30));
+
+    const date =
+      new Date(
+        baseDate.getTime() +
+        value * 24 * 60 * 60 * 1000
+      );
+
+    if (!isNaN(date.getTime())) {
+
+      return (
+        date.getUTCFullYear() +
+        ". " +
+        (date.getUTCMonth() + 1) +
+        ". " +
+        date.getUTCDate() +
+        "."
+      );
+
+    }
+  }
+
+
+  /* -----------------------------------------------
+     5. 문자열이 숫자로 전달되는 경우
+  ------------------------------------------------ */
+
+  if (
+    /^(\d+)(\.\d+)?$/.test(raw)
+  ) {
+
+    const serial =
+      Number(raw);
+
+    if (Number.isFinite(serial)) {
+
+      const baseDate =
+        new Date(Date.UTC(1899, 11, 30));
+
+      const date =
+        new Date(
+          baseDate.getTime() +
+          serial * 24 * 60 * 60 * 1000
+        );
+
+      if (!isNaN(date.getTime())) {
+
+        return (
+          date.getUTCFullYear() +
+          ". " +
+          (date.getUTCMonth() + 1) +
+          ". " +
+          date.getUTCDate() +
+          "."
+        );
+
+      }
+    }
+  }
+
+
+  /* -----------------------------------------------
+     6. 마지막 안전장치
+
+     일반적인 날짜라면 Date로 변환
+  ------------------------------------------------ */
 
   const date =
     new Date(raw);
 
-
   if (!isNaN(date.getTime())) {
 
-    return makeDateText(date);
+    return (
+      date.getFullYear() +
+      ". " +
+      (date.getMonth() + 1) +
+      ". " +
+      date.getDate() +
+      "."
+    );
 
   }
 
 
-  /* -----------------------------------------
-     4.
-     어떤 형식인지 모르더라도
-     NaN은 절대 표시하지 않음
-  ----------------------------------------- */
+  /* -----------------------------------------------
+     7. 그래도 못 읽으면 원본 표시
 
-  console.warn(
-    "날짜 형식을 해석하지 못했습니다:",
-    value
-  );
+     ★ NaN 절대 출력하지 않음
+  ------------------------------------------------ */
 
-  return "";
-
+  return raw;
 }
 
 
-/* =====================================================
-   날짜 객체 → YYYY. M. D.
-===================================================== */
-
-function makeDateText(date) {
-
-  if (
-    !(date instanceof Date) ||
-    isNaN(date.getTime())
-  ) {
-    return "";
-  }
-
-
-  return (
-    date.getFullYear() +
-    ". " +
-    (date.getMonth() + 1) +
-    ". " +
-    date.getDate() +
-    "."
-  );
-
-}
-
-
-/* =====================================================
+/* =========================
    페이지 이동
-===================================================== */
+========================= */
 
 function showPage(pageId) {
 
   document.querySelectorAll(".page").forEach(page => {
-
     page.style.display = "none";
-
   });
 
+  document.getElementById("homePage").style.display = "none";
 
-  document.getElementById("homePage").style.display =
-    "none";
-
-
-  document.getElementById(pageId).style.display =
-    "block";
-
+  document.getElementById(pageId).style.display = "block";
 
   if (pageId === "haengbalPage") {
-
     makeHaengbalStudentList();
-
   }
 
-
   window.scrollTo(0, 0);
-
 }
 
 
-/* =====================================================
+/* =========================
    세특 데이터 불러오기
-===================================================== */
+========================= */
 
 async function loadData() {
 
   const status =
     document.getElementById("status");
 
-
   try {
 
     status.textContent =
       "학생 기록을 불러오는 중입니다...";
 
-
     const response =
       await fetch(API_URL);
-
 
     const json =
       await response.json();
 
-
     if (!json.success) {
-
-      throw new Error(
-        json.message || "데이터 오류"
-      );
-
+      throw new Error(json.message);
     }
-
 
     allData =
       json.data || [];
-
 
     status.textContent =
       "전체 기록 " +
       allData.length +
       "건을 불러왔습니다.";
 
-
   } catch (error) {
 
     status.textContent =
       "데이터를 불러오지 못했습니다.";
 
-
-    console.error(
-      "세특 데이터 오류:",
-      error
-    );
+    console.error(error);
 
   }
-
 }
 
 
-/* =====================================================
+/* =========================
    세특 학생 조회
-===================================================== */
+========================= */
 
 function searchStudent() {
 
   const className =
-    document
-      .getElementById("classInput")
-      .value
-      .trim();
-
+    document.getElementById("classInput").value.trim();
 
   const number =
-    document
-      .getElementById("numberInput")
-      .value
-      .trim();
-
-
-  if (!className || !number) {
-
-    document.getElementById("studentArea").innerHTML =
-      "<div class='card'>반과 번호를 입력해주세요.</div>";
-
-    return;
-
-  }
-
+    document.getElementById("numberInput").value.trim();
 
   const studentKey =
     className + "-" + number;
 
-
   const records =
     allData.filter(row =>
-
-      String(
-        row["검색키"] || ""
-      ).trim() === studentKey
-
+      String(row["검색키"]).trim() === studentKey
     );
-
 
   const area =
-    document.getElementById(
-      "studentArea"
-    );
-
+    document.getElementById("studentArea");
 
   if (records.length === 0) {
 
@@ -718,12 +723,9 @@ function searchStudent() {
       "<div class='card'>해당 학생의 기록이 없습니다.</div>";
 
     return;
-
   }
 
-
   let html = `
-
     <div class="student-title">
       ${studentKey} 학생의 수업성찰 기록
     </div>
@@ -739,20 +741,16 @@ function searchStudent() {
       id="aiResult"
       class="card ai-result"
     ></div>
-
   `;
 
 
   records.forEach(record => {
 
     const formattedDate =
-      formatDate(
-        record["타임스탬프"]
-      );
+      formatDate(record["타임스탬프"]);
 
 
     html += `
-
       <div class="card">
 
         <h3>
@@ -800,85 +798,59 @@ function searchStudent() {
         </div>
 
       </div>
-
     `;
-
   });
 
-
-  area.innerHTML =
-    html;
-
+  area.innerHTML = html;
 }
 
 
-/* =====================================================
+/* =========================
    세특 AI
-===================================================== */
+========================= */
 
 async function generateStudentRecord() {
 
   const resultArea =
-    document.getElementById(
-      "aiResult"
-    );
+    document.getElementById("aiResult");
 
-
-  resultArea.style.display =
-    "block";
-
+  resultArea.style.display = "block";
 
   resultArea.innerHTML =
     "✨ 생기부 표현을 만드는 중입니다...";
 
 
   const className =
-    document
-      .getElementById("classInput")
-      .value
-      .trim();
-
+    document.getElementById("classInput").value.trim();
 
   const number =
-    document
-      .getElementById("numberInput")
-      .value
-      .trim();
-
+    document.getElementById("numberInput").value.trim();
 
   const studentKey =
     className + "-" + number;
 
-
   const records =
     allData.filter(row =>
-
-      String(
-        row["검색키"] || ""
-      ).trim() === studentKey
-
+      String(row["검색키"]).trim() === studentKey
     );
 
 
   try {
 
     const response =
-      await fetch(
-        "/api/generate",
-        {
-          method: "POST",
+      await fetch("/api/generate", {
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+        method: "POST",
 
-          body:
-            JSON.stringify({
-              records: records
-            })
-        }
-      );
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          records: records
+        })
+
+      });
 
 
     const data =
@@ -896,7 +868,6 @@ async function generateStudentRecord() {
 
 
     resultArea.innerHTML = `
-
       <div class="label">
         ✨ AI 생기부 표현
       </div>
@@ -908,14 +879,12 @@ async function generateStudentRecord() {
       ">
         ${data.result}
       </div>
-
     `;
 
 
   } catch (error) {
 
     console.error(error);
-
 
     resultArea.innerHTML =
       "AI 생기부 표현을 만드는 중 오류가 발생했습니다.<br>" +
@@ -926,40 +895,28 @@ async function generateStudentRecord() {
 }
 
 
-/* =====================================================
+/* =========================
    행발 데이터 불러오기
-===================================================== */
+========================= */
 
 async function loadHaengbalData() {
 
   try {
 
     const response =
-      await fetch(
-        HAENGBAL_API_URL
-      );
-
+      await fetch(HAENGBAL_API_URL);
 
     const json =
       await response.json();
 
-
     if (!json.success) {
-
-      throw new Error(
-        json.message ||
-        "행발 데이터 오류"
-      );
-
+      throw new Error(json.message);
     }
-
 
     haengbalData =
       json.data || [];
 
-
     makeHaengbalStudentList();
-
 
   } catch (error) {
 
@@ -973,9 +930,9 @@ async function loadHaengbalData() {
 }
 
 
-/* =====================================================
+/* =========================
    행발 학생 목록
-===================================================== */
+========================= */
 
 function makeHaengbalStudentList() {
 
@@ -983,7 +940,6 @@ function makeHaengbalStudentList() {
     document.getElementById(
       "haengbalStudentSelect"
     );
-
 
   if (!select) return;
 
@@ -998,110 +954,79 @@ function makeHaengbalStudentList() {
   haengbalData.forEach(row => {
 
     const number =
-      String(
-        row["학번"] || ""
-      ).trim();
-
+      String(row["학번"] || "").trim();
 
     const name =
-      String(
-        row["이름"] || ""
-      ).trim();
-
+      String(row["이름"] || "").trim();
 
     if (number) {
-
-      students[number] =
-        name;
-
+      students[number] = name;
     }
 
   });
 
 
   const sortedNumbers =
-    Object.keys(students).sort(
-      (a, b) => {
+    Object.keys(students).sort((a, b) => {
 
-        const aa =
-          a.split("-").map(Number);
+      const aa =
+        a.split("-").map(Number);
 
+      const bb =
+        b.split("-").map(Number);
 
-        const bb =
-          b.split("-").map(Number);
+      for (
+        let i = 0;
+        i < Math.max(aa.length, bb.length);
+        i++
+      ) {
 
+        const av =
+          aa[i] || 0;
 
-        for (
-          let i = 0;
-          i < Math.max(
-            aa.length,
-            bb.length
-          );
-          i++
-        ) {
+        const bv =
+          bb[i] || 0;
 
-          const av =
-            aa[i] || 0;
-
-
-          const bv =
-            bb[i] || 0;
-
-
-          if (av !== bv) {
-
-            return av - bv;
-
-          }
-
+        if (av !== bv) {
+          return av - bv;
         }
 
-
-        return 0;
-
       }
-    );
+
+      return 0;
+
+    });
 
 
   sortedNumbers.forEach(number => {
 
     const option =
-      document.createElement(
-        "option"
-      );
-
+      document.createElement("option");
 
     option.value =
       number;
 
-
     option.textContent =
-      number +
-      " " +
+      number + " " +
       students[number];
 
-
-    select.appendChild(
-      option
-    );
+    select.appendChild(option);
 
   });
 
 }
 
 
-/* =====================================================
+/* =========================
    행발 학생 기록
-===================================================== */
+========================= */
 
 function showHaengbalStudent() {
 
   const studentKey =
-    document
-      .getElementById(
-        "haengbalStudentSelect"
-      )
-      .value;
+    document.getElementById(
+      "haengbalStudentSelect"
+    ).value;
 
 
   const area =
@@ -1112,8 +1037,7 @@ function showHaengbalStudent() {
 
   if (!studentKey) {
 
-    area.innerHTML =
-      "";
+    area.innerHTML = "";
 
     return;
 
@@ -1122,11 +1046,7 @@ function showHaengbalStudent() {
 
   const records =
     haengbalData.filter(row =>
-
-      String(
-        row["학번"] || ""
-      ).trim() === studentKey
-
+      String(row["학번"]).trim() === studentKey
     );
 
 
@@ -1168,117 +1088,87 @@ function showHaengbalStudent() {
   `;
 
 
-  records.forEach(
-    (record, index) => {
+  records.forEach((record, index) => {
 
-      const formattedDate =
-        formatDate(
-          record["타임스탬프"]
-        );
+    const formattedDate =
+      formatDate(record["타임스탬프"]);
 
 
-      const friendRelation =
-        record[
-          "학급이나 학교에서 친구들과 어떻게 지냈나요?"
-        ] ||
-
-        record[
-          "  학급이나 학교에서 친구들과 어떻게 지냈나요?  "
-        ] ||
-
-        "";
+    const friendRelation =
+      record["학급이나 학교에서 친구들과 어떻게 지냈나요?"] ||
+      record["  학급이나 학교에서 친구들과 어떻게 지냈나요?  "] ||
+      "";
 
 
-      html += `
+    html += `
 
-        <div class="card">
+      <div class="card">
 
-          <h3>
-            학교생활 성찰 ${index + 1}
-          </h3>
+        <h3>
+          학교생활 성찰 ${index + 1}
+        </h3>
 
-          <div class="label">
-            작성일
-          </div>
-
-          <div>
-            ${formattedDate}
-          </div>
-
-          <div class="label">
-            책임감·자기관리
-          </div>
-
-          <div>
-            ${
-              record[
-                "  요즘 학교에서 나는 어떻게 지내나요?  "
-              ] || ""
-            }
-          </div>
-
-          <div class="label">
-            자기주도·성장
-          </div>
-
-          <div>
-            ${
-              record[
-                "  스스로 계획하거나 노력한 일이 있나요?  "
-              ] || ""
-            }
-          </div>
-
-          <div class="label">
-            배려·소통
-          </div>
-
-          <div>
-            ${
-              record[
-                "  친구들과 지내면서 어떤 모습을 보였나요?  "
-              ] || ""
-            }
-          </div>
-
-          <div class="label">
-            친구 관계
-          </div>
-
-          <div>
-            ${friendRelation}
-          </div>
-
-          <div class="label">
-            기억에 남는 일
-          </div>
-
-          <div>
-            ${
-              record[
-                "요즘 학교생활에서 가장 기억에 남는 일이 있다면 적어주세요\n설명:\n친구와 있었던 일, 내가 노력한 일, 어려움을 해결한 일, 뿌듯했던 일 등 자유롭게 적어주세요."
-              ] || ""
-            }
-          </div>
-
-          <div class="label">
-            선생님께 하고 싶은 말
-          </div>
-
-          <div>
-            ${
-              record[
-                "학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요?\n설명:\n나의 학교생활, 친구 관계, 고민, 변화, 잘하고 있는 점 등 선생님께 이야기하고 싶은 내용을 자유롭게 적어주세요."
-              ] || ""
-            }
-          </div>
-
+        <div class="label">
+          작성일
         </div>
 
-      `;
+        <div>
+          ${formattedDate}
+        </div>
 
-    }
-  );
+        <div class="label">
+          책임감·자기관리
+        </div>
+
+        <div>
+          ${record["  요즘 학교에서 나는 어떻게 지내나요?  "] || ""}
+        </div>
+
+        <div class="label">
+          자기주도·성장
+        </div>
+
+        <div>
+          ${record["  스스로 계획하거나 노력한 일이 있나요?  "] || ""}
+        </div>
+
+        <div class="label">
+          배려·소통
+        </div>
+
+        <div>
+          ${record["  친구들과 지내면서 어떤 모습을 보였나요?  "] || ""}
+        </div>
+
+        <div class="label">
+          친구 관계
+        </div>
+
+        <div>
+          ${friendRelation}
+        </div>
+
+        <div class="label">
+          기억에 남는 일
+        </div>
+
+        <div>
+          ${record["요즘 학교생활에서 가장 기억에 남는 일이 있다면 적어주세요\n설명:\n친구와 있었던 일, 내가 노력한 일, 어려움을 해결한 일, 뿌듯했던 일 등 자유롭게 적어주세요."] || ""}
+        </div>
+
+        <div class="label">
+          선생님께 하고 싶은 말
+        </div>
+
+        <div>
+          ${record["학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요?\n설명:\n나의 학교생활, 친구 관계, 고민, 변화, 잘하고 있는 점 등 선생님께 이야기하고 싶은 내용을 자유롭게 적어주세요."] || ""}
+        </div>
+
+      </div>
+
+    `;
+
+  });
 
 
   area.innerHTML =
@@ -1287,9 +1177,9 @@ function showHaengbalStudent() {
 }
 
 
-/* =====================================================
+/* =========================
    행발 AI
-===================================================== */
+========================= */
 
 async function generateHaengbalRecord() {
 
@@ -1308,20 +1198,14 @@ async function generateHaengbalRecord() {
 
 
   const studentKey =
-    document
-      .getElementById(
-        "haengbalStudentSelect"
-      )
-      .value;
+    document.getElementById(
+      "haengbalStudentSelect"
+    ).value;
 
 
   const records =
     haengbalData.filter(row =>
-
-      String(
-        row["학번"] || ""
-      ).trim() === studentKey
-
+      String(row["학번"]).trim() === studentKey
     );
 
 
@@ -1348,10 +1232,9 @@ async function generateHaengbalRecord() {
               "application/json"
           },
 
-          body:
-            JSON.stringify({
-              records: records
-            })
+          body: JSON.stringify({
+            records: records
+          })
         }
       );
 
@@ -1391,7 +1274,6 @@ async function generateHaengbalRecord() {
 
     console.error(error);
 
-
     resultArea.innerHTML =
       "AI 행발 표현을 만드는 중 오류가 발생했습니다.<br>" +
       error.message;
@@ -1401,9 +1283,9 @@ async function generateHaengbalRecord() {
 }
 
 
-/* =====================================================
+/* =========================
    시작
-===================================================== */
+========================= */
 
 loadData();
 

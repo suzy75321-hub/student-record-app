@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -165,18 +166,8 @@ button:hover {
 }
 
 @media (max-width: 600px) {
-
   .menu-grid {
     grid-template-columns: 1fr;
-  }
-
-  input,
-  select,
-  button {
-    width: 100%;
-    margin-bottom: 10px;
-    margin-right: 0;
-    box-sizing: border-box;
   }
 }
 </style>
@@ -189,7 +180,6 @@ button:hover {
 </header>
 
 <div class="container">
-
 
 <!-- =========================
      첫 화면
@@ -208,68 +198,40 @@ button:hover {
   <div class="menu-grid">
 
     <div class="menu-card" onclick="showPage('setukPage')">
-
       <div class="menu-icon">📚</div>
-
-      <div class="menu-title">
-        세특
-      </div>
-
+      <div class="menu-title">세특</div>
       <div class="menu-description">
         수업성찰을 바탕으로 세부능력 및 특기사항 작성
       </div>
-
     </div>
 
-
     <div class="menu-card" onclick="showPage('haengbalPage')">
-
       <div class="menu-icon">🌱</div>
-
-      <div class="menu-title">
-        행발
-      </div>
-
+      <div class="menu-title">행발</div>
       <div class="menu-description">
         학교생활 성찰을 바탕으로 행동특성 및 종합의견 작성
       </div>
-
     </div>
 
-
     <div class="menu-card" onclick="showPage('careerPage')">
-
       <div class="menu-icon">🎯</div>
-
-      <div class="menu-title">
-        진로
-      </div>
-
+      <div class="menu-title">진로</div>
       <div class="menu-description">
         진로 성찰을 바탕으로 진로 관련 기록 작성
       </div>
-
     </div>
 
-
     <div class="menu-card" onclick="showPage('creativePage')">
-
       <div class="menu-icon">⭐</div>
-
-      <div class="menu-title">
-        창체
-      </div>
-
+      <div class="menu-title">창체</div>
       <div class="menu-description">
         창의적 체험활동 성찰을 바탕으로 기록 작성
       </div>
-
     </div>
 
   </div>
 
 </div>
-
 
 
 <!-- =========================
@@ -278,20 +240,13 @@ button:hover {
 
 <div id="setukPage" class="page">
 
-  <button
-    class="back-button"
-    onclick="showPage('homePage')"
-  >
+  <button class="back-button" onclick="showPage('homePage')">
     ← 처음으로
   </button>
 
-
   <div class="search-box">
 
-    <h2>
-      📚 학생 수업성찰 기록
-    </h2>
-
+    <h2>📚 학생 수업성찰 기록</h2>
 
     <input
       id="classInput"
@@ -299,28 +254,23 @@ button:hover {
       placeholder="반 예: 1-7"
     >
 
-
     <input
       id="numberInput"
       type="number"
       placeholder="번호"
     >
 
-
     <button onclick="searchStudent()">
       조회
     </button>
-
 
     <div id="status"></div>
 
   </div>
 
-
   <div id="studentArea"></div>
 
 </div>
-
 
 
 <!-- =========================
@@ -329,20 +279,13 @@ button:hover {
 
 <div id="haengbalPage" class="page">
 
-  <button
-    class="back-button"
-    onclick="showPage('homePage')"
-  >
+  <button class="back-button" onclick="showPage('homePage')">
     ← 처음으로
   </button>
 
-
   <div class="search-box">
 
-    <h2>
-      🌱 행발 작성
-    </h2>
-
+    <h2>🌱 행발 작성</h2>
 
     <select
       id="haengbalStudentSelect"
@@ -354,20 +297,16 @@ button:hover {
         border-radius:8px;
       "
     >
-
       <option value="">
         학생을 선택하세요
       </option>
-
     </select>
 
   </div>
 
-
   <div id="haengbalStudentArea"></div>
 
 </div>
-
 
 
 <!-- =========================
@@ -376,33 +315,24 @@ button:hover {
 
 <div id="careerPage" class="page">
 
-  <button
-    class="back-button"
-    onclick="showPage('homePage')"
-  >
+  <button class="back-button" onclick="showPage('homePage')">
     ← 처음으로
   </button>
 
-
   <div class="coming-soon">
 
-    <h2>
-      🎯 진로
-    </h2>
+    <h2>🎯 진로</h2>
 
     <p>
       진로 성찰을 바탕으로<br>
       진로 관련 생활기록부 기록을 작성합니다.
     </p>
 
-    <p>
-      준비 중입니다.
-    </p>
+    <p>준비 중입니다.</p>
 
   </div>
 
 </div>
-
 
 
 <!-- =========================
@@ -411,28 +341,20 @@ button:hover {
 
 <div id="creativePage" class="page">
 
-  <button
-    class="back-button"
-    onclick="showPage('homePage')"
-  >
+  <button class="back-button" onclick="showPage('homePage')">
     ← 처음으로
   </button>
 
-
   <div class="coming-soon">
 
-    <h2>
-      ⭐ 창체
-    </h2>
+    <h2>⭐ 창체</h2>
 
     <p>
-      창의적 체험활동 성찰 설문을 바탕으로<br>
+      창의적 체험활동 성찰을 바탕으로<br>
       생활기록부 기록을 작성합니다.
     </p>
 
-    <p>
-      준비 중입니다.
-    </p>
+    <p>준비 중입니다.</p>
 
   </div>
 
@@ -441,9 +363,7 @@ button:hover {
 </div>
 
 
-
 <script>
-
 
 /* =====================================================
    API 주소
@@ -452,61 +372,100 @@ button:hover {
 const API_URL =
 "https://script.google.com/macros/s/AKfycbx29VbzFJifdQdNVB54gJvev4y-1iNfmwte34n5Pj4QAbfmbakeDV4CazSZV57lHp5uyQ/exec";
 
-
 const HAENGBAL_API_URL =
 "https://script.google.com/macros/s/AKfycbynhrkaaqu-CYzncBBqga3NG0_s7yoid8kenAmzccSO_gqQS92Nop9ZMmZFsyu1vapw/exec";
 
 
 let allData = [];
-
 let haengbalData = [];
 
 
-
 /* =====================================================
-   날짜 표시
-   중요:
-   new Date()를 사용하지 않는다.
-   Google 설문에서 오는 문자열을 그대로 분석한다.
+   ★ 날짜 처리 함수
+   여러 가지 날짜 형식을 모두 안전하게 처리
 ===================================================== */
 
 function formatDate(value) {
 
   if (
     value === null ||
-    value === undefined
+    value === undefined ||
+    value === ""
   ) {
-
     return "";
+  }
+
+
+  /* -----------------------------------------
+     1. 숫자로 들어오는 경우
+     Unix timestamp / 밀리초 처리
+  ----------------------------------------- */
+
+  if (typeof value === "number") {
+
+    const date =
+      new Date(value);
+
+    if (!isNaN(date.getTime())) {
+
+      return makeDateText(date);
+
+    }
 
   }
 
+
+  /* -----------------------------------------
+     2. 객체로 들어오는 경우
+     ----------------------------------------- */
+
+  if (typeof value === "object") {
+
+    try {
+
+      const date =
+        new Date(value);
+
+      if (!isNaN(date.getTime())) {
+
+        return makeDateText(date);
+
+      }
+
+    } catch (e) {
+
+      console.log("날짜 객체 처리 실패:", e);
+
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     3. 문자열 처리
+  ----------------------------------------- */
 
   const raw =
     String(value).trim();
 
 
   if (!raw) {
-
     return "";
-
   }
 
 
-  /*
-    Google 설문 실제 데이터
+  /* -----------------------------------------
+     3-1.
+     Google 설문에서 자주 오는 형식
 
-    2026. 8. 13 오전 4:17:15
+     2026. 8. 13 오전 4:17:15
 
-    또는
+     날짜 부분만 직접 추출
+  ----------------------------------------- */
 
-    2026. 8. 13 오후 2:32:23
-  */
-
-
-  const match =
+  let match =
     raw.match(
-      /^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/
+      /(\d{4})\s*[./-]\s*(\d{1,2})\s*[./-]\s*(\d{1,2})/
     );
 
 
@@ -515,50 +474,100 @@ function formatDate(value) {
     return (
       match[1] +
       ". " +
-      match[2] +
+      Number(match[2]) +
       ". " +
-      match[3] +
+      Number(match[3]) +
       "."
     );
 
   }
 
 
-  /*
-    혹시 이미 YYYY-MM-DD 형식이라면
-  */
+  /* -----------------------------------------
+     3-2.
+     ISO 날짜
 
+     예:
+     2026-08-13T04:17:15.000Z
+     2026-08-13T04:17:15+09:00
+  ----------------------------------------- */
 
-  const isoMatch =
+  match =
     raw.match(
-      /^(\d{4})-(\d{1,2})-(\d{1,2})/
+      /^(\d{4})-(\d{2})-(\d{2})/
     );
 
 
-  if (isoMatch) {
+  if (match) {
 
     return (
-      isoMatch[1] +
+      match[1] +
       ". " +
-      isoMatch[2] +
+      Number(match[2]) +
       ". " +
-      isoMatch[3] +
+      Number(match[3]) +
       "."
     );
 
   }
 
 
-  /*
-    그 외에는 원본을 그대로 표시
-    절대로 NaN을 만들지 않는다.
-  */
+  /* -----------------------------------------
+     3-3.
+     일반 날짜 문자열
+  ----------------------------------------- */
+
+  const date =
+    new Date(raw);
 
 
-  return raw;
+  if (!isNaN(date.getTime())) {
+
+    return makeDateText(date);
+
+  }
+
+
+  /* -----------------------------------------
+     4.
+     어떤 형식인지 모르더라도
+     NaN은 절대 표시하지 않음
+  ----------------------------------------- */
+
+  console.warn(
+    "날짜 형식을 해석하지 못했습니다:",
+    value
+  );
+
+  return "";
 
 }
 
+
+/* =====================================================
+   날짜 객체 → YYYY. M. D.
+===================================================== */
+
+function makeDateText(date) {
+
+  if (
+    !(date instanceof Date) ||
+    isNaN(date.getTime())
+  ) {
+    return "";
+  }
+
+
+  return (
+    date.getFullYear() +
+    ". " +
+    (date.getMonth() + 1) +
+    ". " +
+    date.getDate() +
+    "."
+  );
+
+}
 
 
 /* =====================================================
@@ -567,28 +576,22 @@ function formatDate(value) {
 
 function showPage(pageId) {
 
-  document
-    .querySelectorAll(".page")
-    .forEach(page => {
+  document.querySelectorAll(".page").forEach(page => {
 
-      page.style.display = "none";
+    page.style.display = "none";
 
-    });
+  });
 
 
-  document
-    .getElementById("homePage")
-    .style.display = "none";
+  document.getElementById("homePage").style.display =
+    "none";
 
 
-  document
-    .getElementById(pageId)
-    .style.display = "block";
+  document.getElementById(pageId).style.display =
+    "block";
 
 
-  if (
-    pageId === "haengbalPage"
-  ) {
+  if (pageId === "haengbalPage") {
 
     makeHaengbalStudentList();
 
@@ -598,7 +601,6 @@ function showPage(pageId) {
   window.scrollTo(0, 0);
 
 }
-
 
 
 /* =====================================================
@@ -628,8 +630,7 @@ async function loadData() {
     if (!json.success) {
 
       throw new Error(
-        json.message ||
-        "데이터를 불러오지 못했습니다."
+        json.message || "데이터 오류"
       );
 
     }
@@ -644,21 +645,21 @@ async function loadData() {
       allData.length +
       "건을 불러왔습니다.";
 
-  }
 
-
-  catch (error) {
+  } catch (error) {
 
     status.textContent =
       "데이터를 불러오지 못했습니다.";
 
 
-    console.error(error);
+    console.error(
+      "세특 데이터 오류:",
+      error
+    );
 
   }
 
 }
-
 
 
 /* =====================================================
@@ -681,10 +682,18 @@ function searchStudent() {
       .trim();
 
 
+  if (!className || !number) {
+
+    document.getElementById("studentArea").innerHTML =
+      "<div class='card'>반과 번호를 입력해주세요.</div>";
+
+    return;
+
+  }
+
+
   const studentKey =
-    className +
-    "-" +
-    number;
+    className + "-" + number;
 
 
   const records =
@@ -703,9 +712,7 @@ function searchStudent() {
     );
 
 
-  if (
-    records.length === 0
-  ) {
+  if (records.length === 0) {
 
     area.innerHTML =
       "<div class='card'>해당 학생의 기록이 없습니다.</div>";
@@ -721,14 +728,12 @@ function searchStudent() {
       ${studentKey} 학생의 수업성찰 기록
     </div>
 
-
     <button
       class="ai-button"
       onclick="generateStudentRecord()"
     >
       ✨ 생기부 표현 만들기
     </button>
-
 
     <div
       id="aiResult"
@@ -739,7 +744,6 @@ function searchStudent() {
 
 
   records.forEach(record => {
-
 
     const formattedDate =
       formatDate(
@@ -752,13 +756,8 @@ function searchStudent() {
       <div class="card">
 
         <h3>
-          ${
-            record[
-              "오늘 수업의 주제 또는 활동은 무엇이었나요?"
-            ] || ""
-          }
+          ${record["오늘 수업의 주제 또는 활동은 무엇이었나요?"] || ""}
         </h3>
-
 
         <div class="label">
           수업일
@@ -768,56 +767,36 @@ function searchStudent() {
           ${formattedDate}
         </div>
 
-
         <div class="label">
           내가 한 일
         </div>
 
         <div>
-          ${
-            record[
-              "오늘 수업에서 내가 한 활동은 무엇인가요?"
-            ] || ""
-          }
+          ${record["오늘 수업에서 내가 한 활동은 무엇인가요?"] || ""}
         </div>
-
 
         <div class="label">
           배운 점
         </div>
 
         <div>
-          ${
-            record[
-              "오늘 활동을 통해 새롭게 알게 되거나 이해하게 된 점은 무엇인가요?( 예: 자료를 찾아보면서 같은 문제도 여러 가지 해결 방법이 있다는 것을 알게 되었다.)"
-            ] || ""
-          }
+          ${record["오늘 활동을 통해 새롭게 알게 되거나 이해하게 된 점은 무엇인가요?( 예: 자료를 찾아보면서 같은 문제도 여러 가지 해결 방법이 있다는 것을 알게 되었다.)"] || ""}
         </div>
-
 
         <div class="label">
           어려움·해결
         </div>
 
         <div>
-          ${
-            record[
-              "오늘 활동에서 어려웠던 점이나 잘 해결되지 않았던 점이 있었다면, 어떻게 해결했나요?(예: 자료를 찾는 데 어려움이 있었지만 검색어를 바꿔서 관련 자료를 찾았다.)"
-            ] || ""
-          }
+          ${record["오늘 활동에서 어려웠던 점이나 잘 해결되지 않았던 점이 있었다면, 어떻게 해결했나요?(예: 자료를 찾는 데 어려움이 있었지만 검색어를 바꿔서 관련 자료를 찾았다.)"] || ""}
         </div>
-
 
         <div class="label">
           나의 기여
         </div>
 
         <div>
-          ${
-            record[
-              "오늘 모둠·짝 활동에서 내가 한 기여는 무엇인가요? (여러 개 선택 가능)"
-            ] || ""
-          }
+          ${record["오늘 모둠·짝 활동에서 내가 한 기여는 무엇인가요? (여러 개 선택 가능)"] || ""}
         </div>
 
       </div>
@@ -831,7 +810,6 @@ function searchStudent() {
     html;
 
 }
-
 
 
 /* =====================================================
@@ -869,9 +847,7 @@ async function generateStudentRecord() {
 
 
   const studentKey =
-    className +
-    "-" +
-    number;
+    className + "-" + number;
 
 
   const records =
@@ -890,7 +866,6 @@ async function generateStudentRecord() {
       await fetch(
         "/api/generate",
         {
-
           method: "POST",
 
           headers: {
@@ -898,10 +873,10 @@ async function generateStudentRecord() {
               "application/json"
           },
 
-          body: JSON.stringify({
-            records: records
-          })
-
+          body:
+            JSON.stringify({
+              records: records
+            })
         }
       );
 
@@ -926,7 +901,6 @@ async function generateStudentRecord() {
         ✨ AI 생기부 표현
       </div>
 
-
       <div style="
         line-height:1.8;
         margin-top:10px;
@@ -937,10 +911,8 @@ async function generateStudentRecord() {
 
     `;
 
-  }
 
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -952,7 +924,6 @@ async function generateStudentRecord() {
   }
 
 }
-
 
 
 /* =====================================================
@@ -977,7 +948,7 @@ async function loadHaengbalData() {
 
       throw new Error(
         json.message ||
-        "행발 데이터를 불러오지 못했습니다."
+        "행발 데이터 오류"
       );
 
     }
@@ -989,10 +960,8 @@ async function loadHaengbalData() {
 
     makeHaengbalStudentList();
 
-  }
 
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "행발 데이터 오류:",
@@ -1002,7 +971,6 @@ async function loadHaengbalData() {
   }
 
 }
-
 
 
 /* =====================================================
@@ -1017,26 +985,14 @@ function makeHaengbalStudentList() {
     );
 
 
-  if (!select) {
-
-    return;
-
-  }
+  if (!select) return;
 
 
   select.innerHTML =
-    `<option value="">
-      학생을 선택하세요
-    </option>`;
+    `<option value="">학생을 선택하세요</option>`;
 
 
   const students = {};
-
-
-  /*
-    같은 학생이 여러 번 응답해도
-    학생 목록에는 한 번만 표시
-  */
 
 
   haengbalData.forEach(row => {
@@ -1053,10 +1009,7 @@ function makeHaengbalStudentList() {
       ).trim();
 
 
-    if (
-      number &&
-      !students[number]
-    ) {
+    if (number) {
 
       students[number] =
         name;
@@ -1067,9 +1020,8 @@ function makeHaengbalStudentList() {
 
 
   const sortedNumbers =
-    Object.keys(students)
-      .sort((a, b) => {
-
+    Object.keys(students).sort(
+      (a, b) => {
 
         const aa =
           a.split("-").map(Number);
@@ -1081,8 +1033,7 @@ function makeHaengbalStudentList() {
 
         for (
           let i = 0;
-          i <
-          Math.max(
+          i < Math.max(
             aa.length,
             bb.length
           );
@@ -1097,9 +1048,7 @@ function makeHaengbalStudentList() {
             bb[i] || 0;
 
 
-          if (
-            av !== bv
-          ) {
+          if (av !== bv) {
 
             return av - bv;
 
@@ -1110,7 +1059,8 @@ function makeHaengbalStudentList() {
 
         return 0;
 
-      });
+      }
+    );
 
 
   sortedNumbers.forEach(number => {
@@ -1138,7 +1088,6 @@ function makeHaengbalStudentList() {
   });
 
 }
-
 
 
 /* =====================================================
@@ -1181,9 +1130,7 @@ function showHaengbalStudent() {
     );
 
 
-  if (
-    records.length === 0
-  ) {
+  if (records.length === 0) {
 
     area.innerHTML =
       "<div class='card'>행발 기록이 없습니다.</div>";
@@ -1202,13 +1149,9 @@ function showHaengbalStudent() {
   let html = `
 
     <div class="student-title">
-
-      ${studentKey}
-      ${name}
+      ${studentKey} ${name}
       학생의 학교생활 성찰 기록
-
     </div>
-
 
     <button
       class="ai-button"
@@ -1216,7 +1159,6 @@ function showHaengbalStudent() {
     >
       ✨ AI 행발 표현 만들기
     </button>
-
 
     <div
       id="haengbalAiResult"
@@ -1229,80 +1171,22 @@ function showHaengbalStudent() {
   records.forEach(
     (record, index) => {
 
-
-      /*
-        날짜는 반드시
-        formatDate()를 통해 처리
-      */
-
-
       const formattedDate =
         formatDate(
           record["타임스탬프"]
         );
 
 
-      /*
-        설문 열 제목 앞뒤 공백 대응
-      */
-
-
-      const responsibility =
-        getValue(
-          record,
-          [
-            "요즘 학교에서 나는 어떻게 지내나요?",
-            "  요즘 학교에서 나는 어떻게 지내나요?  "
-          ]
-        );
-
-
-      const growth =
-        getValue(
-          record,
-          [
-            "스스로 계획하거나 노력한 일이 있나요?",
-            "  스스로 계획하거나 노력한 일이 있나요?  "
-          ]
-        );
-
-
-      const communication =
-        getValue(
-          record,
-          [
-            "친구들과 지내면서 어떤 모습을 보였나요?",
-            "  친구들과 지내면서 어떤 모습을 보였나요?  "
-          ]
-        );
-
-
       const friendRelation =
-        getValue(
-          record,
-          [
-            "학급이나 학교에서 친구들과 어떻게 지냈나요?",
-            "  학급이나 학교에서 친구들과 어떻게 지냈나요?  "
-          ]
-        );
+        record[
+          "학급이나 학교에서 친구들과 어떻게 지냈나요?"
+        ] ||
 
+        record[
+          "  학급이나 학교에서 친구들과 어떻게 지냈나요?  "
+        ] ||
 
-      const memorable =
-        getValue(
-          record,
-          [
-            "요즘 학교생활에서 가장 기억에 남는 일이 있다면 적어주세요\n설명:\n친구와 있었던 일, 내가 노력한 일, 어려움을 해결한 일, 뿌듯했던 일 등 자유롭게 적어주세요."
-          ]
-        );
-
-
-      const teacherMessage =
-        getValue(
-          record,
-          [
-            "학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요?\n설명:\n나의 학교생활, 친구 관계, 고민, 변화, 잘하고 있는 점 등 선생님께 이야기하고 싶은 내용을 자유롭게 적어주세요."
-          ]
-        );
+        "";
 
 
       html += `
@@ -1313,7 +1197,6 @@ function showHaengbalStudent() {
             학교생활 성찰 ${index + 1}
           </h3>
 
-
           <div class="label">
             작성일
           </div>
@@ -1322,33 +1205,41 @@ function showHaengbalStudent() {
             ${formattedDate}
           </div>
 
-
           <div class="label">
             책임감·자기관리
           </div>
 
           <div>
-            ${responsibility}
+            ${
+              record[
+                "  요즘 학교에서 나는 어떻게 지내나요?  "
+              ] || ""
+            }
           </div>
-
 
           <div class="label">
             자기주도·성장
           </div>
 
           <div>
-            ${growth}
+            ${
+              record[
+                "  스스로 계획하거나 노력한 일이 있나요?  "
+              ] || ""
+            }
           </div>
-
 
           <div class="label">
             배려·소통
           </div>
 
           <div>
-            ${communication}
+            ${
+              record[
+                "  친구들과 지내면서 어떤 모습을 보였나요?  "
+              ] || ""
+            }
           </div>
-
 
           <div class="label">
             친구 관계
@@ -1358,22 +1249,28 @@ function showHaengbalStudent() {
             ${friendRelation}
           </div>
 
-
           <div class="label">
             기억에 남는 일
           </div>
 
           <div>
-            ${memorable}
+            ${
+              record[
+                "요즘 학교생활에서 가장 기억에 남는 일이 있다면 적어주세요\n설명:\n친구와 있었던 일, 내가 노력한 일, 어려움을 해결한 일, 뿌듯했던 일 등 자유롭게 적어주세요."
+              ] || ""
+            }
           </div>
-
 
           <div class="label">
             선생님께 하고 싶은 말
           </div>
 
           <div>
-            ${teacherMessage}
+            ${
+              record[
+                "학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요?\n설명:\n나의 학교생활, 친구 관계, 고민, 변화, 잘하고 있는 점 등 선생님께 이야기하고 싶은 내용을 자유롭게 적어주세요."
+              ] || ""
+            }
           </div>
 
         </div>
@@ -1388,82 +1285,6 @@ function showHaengbalStudent() {
     html;
 
 }
-
-
-
-/* =====================================================
-   설문 열 제목 안전하게 가져오기
-===================================================== */
-
-function getValue(
-  record,
-  possibleKeys
-) {
-
-  for (
-    const key of possibleKeys
-  ) {
-
-    if (
-      Object.prototype.hasOwnProperty.call(
-        record,
-        key
-      )
-    ) {
-
-      const value =
-        record[key];
-
-
-      if (
-        value !== null &&
-        value !== undefined &&
-        String(value).trim() !== ""
-      ) {
-
-        return String(value);
-
-      }
-
-    }
-
-  }
-
-
-  /*
-    혹시 열 제목 앞뒤 공백 때문에
-    정확한 키를 찾지 못하는 경우
-  */
-
-  const wanted =
-    possibleKeys.map(
-      key => key.trim()
-    );
-
-
-  for (
-    const actualKey of Object.keys(record)
-  ) {
-
-    if (
-      wanted.includes(
-        actualKey.trim()
-      )
-    ) {
-
-      return String(
-        record[actualKey] || ""
-      );
-
-    }
-
-  }
-
-
-  return "";
-
-}
-
 
 
 /* =====================================================
@@ -1504,9 +1325,7 @@ async function generateHaengbalRecord() {
     );
 
 
-  if (
-    records.length === 0
-  ) {
+  if (records.length === 0) {
 
     resultArea.innerHTML =
       "학생 기록이 없습니다.";
@@ -1522,7 +1341,6 @@ async function generateHaengbalRecord() {
       await fetch(
         "/api/generate-haengbal",
         {
-
           method: "POST",
 
           headers: {
@@ -1530,10 +1348,10 @@ async function generateHaengbalRecord() {
               "application/json"
           },
 
-          body: JSON.stringify({
-            records: records
-          })
-
+          body:
+            JSON.stringify({
+              records: records
+            })
         }
       );
 
@@ -1558,7 +1376,6 @@ async function generateHaengbalRecord() {
         ✨ AI 행발 표현
       </div>
 
-
       <div style="
         line-height:1.8;
         margin-top:10px;
@@ -1569,10 +1386,8 @@ async function generateHaengbalRecord() {
 
     `;
 
-  }
 
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -1584,7 +1399,6 @@ async function generateHaengbalRecord() {
   }
 
 }
-
 
 
 /* =====================================================
@@ -1599,3 +1413,4 @@ loadHaengbalData();
 
 </body>
 </html>
+```

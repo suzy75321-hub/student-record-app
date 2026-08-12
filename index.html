@@ -27,7 +27,6 @@ header {
   padding: 20px;
 }
 
-/* 첫 화면 */
 #homePage {
   text-align: center;
 }
@@ -62,6 +61,7 @@ header {
 
 .menu-card:hover {
   transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 }
 
 .menu-icon {
@@ -95,7 +95,9 @@ header {
   margin-bottom: 20px;
 }
 
-input, button, select {
+input,
+button,
+select {
   padding: 12px;
   font-size: 16px;
   margin-right: 8px;
@@ -147,6 +149,22 @@ button:hover {
   padding: 50px 20px;
   border-radius: 15px;
   text-align: center;
+  color: #666;
+}
+
+.ai-button {
+  background: #16a34a;
+  margin-bottom: 20px;
+}
+
+.ai-result {
+  display: none;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  border-left: 5px solid #16a34a;
+}
+
+.loading {
   color: #666;
 }
 
@@ -313,9 +331,7 @@ button:hover {
       진로 관련 생활기록부 기록을 작성합니다.
     </p>
 
-    <p>
-      준비 중입니다.
-    </p>
+    <p>준비 중입니다.</p>
 
   </div>
 
@@ -341,9 +357,7 @@ button:hover {
       생활기록부 기록을 작성합니다.
     </p>
 
-    <p>
-      준비 중입니다.
-    </p>
+    <p>준비 중입니다.</p>
 
   </div>
 
@@ -355,23 +369,17 @@ button:hover {
 <script>
 
 /* =========================
-   세특 API
+   API 주소
 ========================= */
 
 const API_URL =
 "https://script.google.com/macros/s/AKfycbx29VbzFJifdQdNVB54gJvev4y-1iNfmwte34n5Pj4QAbfmbakeDV4CazSZV57lHp5uyQ/exec";
-
-
-/* =========================
-   행발 API
-========================= */
 
 const HAENGBAL_API_URL =
 "https://script.google.com/macros/s/AKfycbynhrkaaqu-CYzncBBqga3NG0_s7yoid8kenAmzccSO_gqQS92Nop9ZMmZFsyu1vapw/exec";
 
 
 let allData = [];
-
 let haengbalData = [];
 
 
@@ -389,13 +397,16 @@ function showPage(pageId) {
 
   document.getElementById(pageId).style.display = "block";
 
-  window.scrollTo(0, 0);
+  if (pageId === "haengbalPage") {
+    makeHaengbalStudentList();
+  }
 
+  window.scrollTo(0, 0);
 }
 
 
 /* =========================
-   세특 데이터
+   세특 데이터 불러오기
 ========================= */
 
 async function loadData() {
@@ -403,12 +414,10 @@ async function loadData() {
   const status =
     document.getElementById("status");
 
-  if (!status) return;
-
-  status.textContent =
-    "학생 기록을 불러오는 중입니다...";
-
   try {
+
+    status.textContent =
+      "학생 기록을 불러오는 중입니다...";
 
     const response =
       await fetch(API_URL);
@@ -436,7 +445,6 @@ async function loadData() {
     console.error(error);
 
   }
-
 }
 
 
@@ -447,28 +455,21 @@ async function loadData() {
 function searchStudent() {
 
   const className =
-    document.getElementById("classInput")
-      .value.trim();
+    document.getElementById("classInput").value.trim();
 
   const number =
-    document.getElementById("numberInput")
-      .value.trim();
+    document.getElementById("numberInput").value.trim();
 
   const studentKey =
     className + "-" + number;
 
   const records =
-    allData.filter(row => {
-
-      return String(row["검색키"]).trim()
-        === studentKey;
-
-    });
-
+    allData.filter(row =>
+      String(row["검색키"]).trim() === studentKey
+    );
 
   const area =
     document.getElementById("studentArea");
-
 
   if (records.length === 0) {
 
@@ -476,34 +477,24 @@ function searchStudent() {
       "<div class='card'>해당 학생의 기록이 없습니다.</div>";
 
     return;
-
   }
 
-
-  let html =
-    "<div class='student-title'>" +
-    studentKey +
-    " 학생의 수업성찰 기록</div>";
-
-
-  html += `
+  let html = `
+    <div class="student-title">
+      ${studentKey} 학생의 수업성찰 기록
+    </div>
 
     <button
+      class="ai-button"
       onclick="generateStudentRecord()"
-      style="
-        margin-bottom:20px;
-        background:#16a34a;
-      "
     >
       ✨ 생기부 표현 만들기
     </button>
 
     <div
       id="aiResult"
-      class="card"
-      style="display:none;"
+      class="card ai-result"
     ></div>
-
   `;
 
 
@@ -512,75 +503,46 @@ function searchStudent() {
     const date =
       new Date(record["타임스탬프"]);
 
-
     const formattedDate =
       date.getFullYear() + ". " +
       (date.getMonth() + 1) + ". " +
       date.getDate() + ".";
 
-
     html += `
-
       <div class="card">
 
         <h3>
           ${record["오늘 수업의 주제 또는 활동은 무엇이었나요?"] || ""}
         </h3>
 
-        <div class="label">
-          수업일
-        </div>
+        <div class="label">수업일</div>
+        <div>${formattedDate}</div>
 
-        <div>
-          ${formattedDate}
-        </div>
-
-
-        <div class="label">
-          내가 한 일
-        </div>
-
+        <div class="label">내가 한 일</div>
         <div>
           ${record["오늘 수업에서 내가 한 활동은 무엇인가요?"] || ""}
         </div>
 
-
-        <div class="label">
-          배운 점
-        </div>
-
+        <div class="label">배운 점</div>
         <div>
           ${record["오늘 활동을 통해 새롭게 알게 되거나 이해하게 된 점은 무엇인가요?( 예: 자료를 찾아보면서 같은 문제도 여러 가지 해결 방법이 있다는 것을 알게 되었다.)"] || ""}
         </div>
 
-
-        <div class="label">
-          어려움·해결
-        </div>
-
+        <div class="label">어려움·해결</div>
         <div>
           ${record["오늘 활동에서 어려웠던 점이나 잘 해결되지 않았던 점이 있었다면, 어떻게 해결했나요?(예: 자료를 찾는 데 어려움이 있었지만 검색어를 바꿔서 관련 자료를 찾았다.)"] || ""}
         </div>
 
-
-        <div class="label">
-          나의 기여
-        </div>
-
+        <div class="label">나의 기여</div>
         <div>
           ${record["오늘 모둠·짝 활동에서 내가 한 기여는 무엇인가요? (여러 개 선택 가능)"] || ""}
         </div>
 
       </div>
-
     `;
-
   });
 
-
-  area.innerHTML =
-    html;
-
+  area.innerHTML = html;
 }
 
 
@@ -593,33 +555,25 @@ async function generateStudentRecord() {
   const resultArea =
     document.getElementById("aiResult");
 
-  resultArea.style.display =
-    "block";
+  resultArea.style.display = "block";
 
   resultArea.innerHTML =
     "✨ 생기부 표현을 만드는 중입니다...";
 
 
   const className =
-    document.getElementById("classInput")
-      .value.trim();
+    document.getElementById("classInput").value.trim();
 
   const number =
-    document.getElementById("numberInput")
-      .value.trim();
-
+    document.getElementById("numberInput").value.trim();
 
   const studentKey =
     className + "-" + number;
 
-
   const records =
-    allData.filter(row => {
-
-      return String(row["검색키"]).trim()
-        === studentKey;
-
-    });
+    allData.filter(row =>
+      String(row["검색키"]).trim() === studentKey
+    );
 
 
   try {
@@ -627,15 +581,14 @@ async function generateStudentRecord() {
     const response =
       await fetch("/api/generate", {
 
-        method:"POST",
+        method: "POST",
 
-        headers:{
-          "Content-Type":
-          "application/json"
+        headers: {
+          "Content-Type": "application/json"
         },
 
-        body:JSON.stringify({
-          records:records
+        body: JSON.stringify({
+          records: records
         })
 
       });
@@ -646,17 +599,14 @@ async function generateStudentRecord() {
 
 
     if (!data.success) {
-
       throw new Error(
         data.message ||
         "AI 생성에 실패했습니다."
       );
-
     }
 
 
     resultArea.innerHTML = `
-
       <div class="label">
         ✨ AI 생기부 표현
       </div>
@@ -668,10 +618,10 @@ async function generateStudentRecord() {
       ">
         ${data.result}
       </div>
-
     `;
 
-  } catch(error) {
+
+  } catch (error) {
 
     console.error(error);
 
@@ -685,7 +635,7 @@ async function generateStudentRecord() {
 
 
 /* =========================
-   행발 데이터
+   행발 데이터 불러오기
 ========================= */
 
 async function loadHaengbalData() {
@@ -707,7 +657,7 @@ async function loadHaengbalData() {
 
     makeHaengbalStudentList();
 
-  } catch(error) {
+  } catch (error) {
 
     console.error(
       "행발 데이터 오류:",
@@ -733,83 +683,73 @@ function makeHaengbalStudentList() {
   if (!select) return;
 
 
+  select.innerHTML =
+    `<option value="">학생을 선택하세요</option>`;
+
+
   const students = {};
 
 
   haengbalData.forEach(row => {
 
     const number =
-      String(row["학번"] || "")
-        .trim();
+      String(row["학번"] || "").trim();
 
     const name =
-      String(row["이름"] || "")
-        .trim();
-
+      String(row["이름"] || "").trim();
 
     if (number) {
-
-      students[number] =
-        name;
-
+      students[number] = name;
     }
 
   });
 
 
   const sortedNumbers =
-    Object.keys(students).sort(
-      (a,b) => {
+    Object.keys(students).sort((a, b) => {
 
-        const aa =
-          a.split("-").map(Number);
+      const aa =
+        a.split("-").map(Number);
 
-        const bb =
-          b.split("-").map(Number);
+      const bb =
+        b.split("-").map(Number);
 
+      for (
+        let i = 0;
+        i < Math.max(aa.length, bb.length);
+        i++
+      ) {
 
-        for (
-          let i = 0;
-          i < aa.length;
-          i++
-        ) {
+        const av =
+          aa[i] || 0;
 
-          if (
-            aa[i] !== bb[i]
-          ) {
+        const bv =
+          bb[i] || 0;
 
-            return aa[i] - bb[i];
-
-          }
-
+        if (av !== bv) {
+          return av - bv;
         }
 
-        return 0;
-
       }
-    );
+
+      return 0;
+
+    });
 
 
   sortedNumbers.forEach(number => {
 
     const option =
-      document.createElement(
-        "option"
-      );
-
+      document.createElement("option");
 
     option.value =
       number;
 
     option.textContent =
-      number +
-      " " +
+      number + " " +
       students[number];
 
-
-    select.appendChild(
-      option
-    );
+    select.appendChild(option);
 
   });
 
@@ -817,7 +757,7 @@ function makeHaengbalStudentList() {
 
 
 /* =========================
-   행발 학생 기록 표시
+   행발 학생 기록
 ========================= */
 
 function showHaengbalStudent() {
@@ -844,13 +784,9 @@ function showHaengbalStudent() {
 
 
   const records =
-    haengbalData.filter(row => {
-
-      return String(
-        row["학번"]
-      ).trim() === studentKey;
-
-    });
+    haengbalData.filter(row =>
+      String(row["학번"]).trim() === studentKey
+    );
 
 
   if (records.length === 0) {
@@ -872,115 +808,204 @@ function showHaengbalStudent() {
   let html = `
 
     <div class="student-title">
-
-      ${studentKey}
-      ${name}
+      ${studentKey} ${name}
       학생의 학교생활 성찰 기록
-
     </div>
+
+    <button
+      class="ai-button"
+      onclick="generateHaengbalRecord()"
+    >
+      ✨ AI 행발 표현 만들기
+    </button>
+
+    <div
+      id="haengbalAiResult"
+      class="card ai-result"
+    ></div>
 
   `;
 
 
-  records.forEach(
-    (record,index) => {
+  records.forEach((record, index) => {
 
-      const date =
-        new Date(
-          record["타임스탬프"]
-        );
+    const date =
+      new Date(record["타임스탬프"]);
 
-
-      const formattedDate =
-        date.getFullYear() +
-        ". " +
-        (date.getMonth()+1) +
-        ". " +
-        date.getDate() +
-        ".";
+    const formattedDate =
+      date.getFullYear() + ". " +
+      (date.getMonth() + 1) + ". " +
+      date.getDate() + ".";
 
 
-      html += `
+    html += `
 
-        <div class="card">
+      <div class="card">
 
-          <h3>
-            학교생활 성찰 ${index+1}
-          </h3>
+        <h3>
+          학교생활 성찰 ${index + 1}
+        </h3>
 
+        <div class="label">작성일</div>
+        <div>${formattedDate}</div>
 
-          <div class="label">
-            작성일
-          </div>
-
-          <div>
-            ${formattedDate}
-          </div>
-
-
-          <div class="label">
-            책임감·자기관리
-          </div>
-
-          <div>
-            ${record["  요즘 학교에서 나는 어떻게 지내나요?  "] || ""}
-          </div>
-
-
-          <div class="label">
-            자기주도·성장
-          </div>
-
-          <div>
-            ${record["  스스로 계획하거나 노력한 일이 있나요?  "] || ""}
-          </div>
-
-
-          <div class="label">
-            배려·소통
-          </div>
-
-          <div>
-            ${record["  친구들과 지내면서 어떤 모습을 보였나요?  "] || ""}
-          </div>
-
-
-          <div class="label">
-            친구 관계
-          </div>
-
-          <div>
-            ${record["학급이나 학교에서 친구들과 어떻게 지냈나요?"] || ""}
-          </div>
-
-
-          <div class="label">
-            기억에 남는 일
-          </div>
-
-          <div>
-            ${record["요즘 학교생활에서 가장 기억에 남는 일이 있다면 적어주세요\n설명:\n친구와 있었던 일, 내가 노력한 일, 어려움을 해결한 일, 뿌듯했던 일 등 자유롭게 적어주세요."] || ""}
-          </div>
-
-
-          <div class="label">
-            선생님께 하고 싶은 말
-          </div>
-
-          <div>
-            ${record["학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요?\n설명:\n나의 학교생활, 친구 관계, 고민, 변화, 잘하고 있는 점 등 선생님께 이야기하고 싶은 내용을 자유롭게 적어주세요."] || ""}
-          </div>
-
+        <div class="label">
+          책임감·자기관리
+        </div>
+        <div>
+          ${record["  요즘 학교에서 나는 어떻게 지내나요?  "] || ""}
         </div>
 
-      `;
+        <div class="label">
+          자기주도·성장
+        </div>
+        <div>
+          ${record["  스스로 계획하거나 노력한 일이 있나요?  "] || ""}
+        </div>
 
-    }
-  );
+        <div class="label">
+          배려·소통
+        </div>
+        <div>
+          ${record["  친구들과 지내면서 어떤 모습을 보였나요?  "] || ""}
+        </div>
+
+        <div class="label">
+          친구 관계
+        </div>
+        <div>
+          ${record["학급이나 학교에서 친구들과 어떻게 지냈나요?"] || ""}
+        </div>
+
+        <div class="label">
+          기억에 남는 일
+        </div>
+        <div>
+          ${record["요즘 학교생활에서 가장 기억에 남는 일이 있다면 적어주세요\n설명:\n친구와 있었던 일, 내가 노력한 일, 어려움을 해결한 일, 뿌듯했던 일 등 자유롭게 적어주세요."] || ""}
+        </div>
+
+        <div class="label">
+          선생님께 하고 싶은 말
+        </div>
+        <div>
+          ${record["학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요?\n설명:\n나의 학교생활, 친구 관계, 고민, 변화, 잘하고 있는 점 등 선생님께 이야기하고 싶은 내용을 자유롭게 적어주세요."] || ""}
+        </div>
+
+      </div>
+
+    `;
+
+  });
 
 
   area.innerHTML =
     html;
+
+}
+
+
+/* =========================
+   행발 AI
+========================= */
+
+async function generateHaengbalRecord() {
+
+  const resultArea =
+    document.getElementById(
+      "haengbalAiResult"
+    );
+
+
+  resultArea.style.display =
+    "block";
+
+
+  resultArea.innerHTML =
+    "✨ AI가 행발 표현을 만드는 중입니다...";
+
+
+  const studentKey =
+    document.getElementById(
+      "haengbalStudentSelect"
+    ).value;
+
+
+  const records =
+    haengbalData.filter(row =>
+      String(row["학번"]).trim() === studentKey
+    );
+
+
+  if (records.length === 0) {
+
+    resultArea.innerHTML =
+      "학생 기록이 없습니다.";
+
+    return;
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        "/api/generate-haengbal",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            records: records
+          })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!data.success) {
+
+      throw new Error(
+        data.message ||
+        "AI 행발 생성에 실패했습니다."
+      );
+
+    }
+
+
+    resultArea.innerHTML = `
+
+      <div class="label">
+        ✨ AI 행발 표현
+      </div>
+
+      <div style="
+        line-height:1.8;
+        margin-top:10px;
+        white-space:pre-wrap;
+      ">
+        ${data.result}
+      </div>
+
+    `;
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    resultArea.innerHTML =
+      "AI 행발 표현을 만드는 중 오류가 발생했습니다.<br>" +
+      error.message;
+
+  }
 
 }
 

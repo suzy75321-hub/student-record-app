@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>학생 기록 앱</title>
+<title>생기부 AI 작성 도우미</title>
 
 <style>
 body {
@@ -25,6 +25,69 @@ header {
   max-width: 1100px;
   margin: 30px auto;
   padding: 20px;
+}
+
+/* 첫 화면 */
+#homePage {
+  text-align: center;
+}
+
+.home-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 50px 0 15px;
+}
+
+.home-subtitle {
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  max-width: 700px;
+  margin: auto;
+}
+
+.menu-card {
+  background: white;
+  border-radius: 18px;
+  padding: 35px 20px;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  transition: 0.2s;
+}
+
+.menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.menu-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.menu-title {
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.menu-description {
+  margin-top: 10px;
+  color: #666;
+}
+
+/* 페이지 */
+.page {
+  display: none;
+}
+
+.back-button {
+  background: #666;
+  margin-bottom: 20px;
 }
 
 .search-box {
@@ -79,31 +142,196 @@ button:hover {
   margin-top: 15px;
   color: #555;
 }
+
+.coming-soon {
+  background: white;
+  padding: 50px 20px;
+  border-radius: 15px;
+  text-align: center;
+  color: #666;
+}
+
+@media (max-width: 600px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 
 <body>
 
 <header>
-학생 수업성찰 기록
+생기부 AI 작성 도우미
 </header>
 
 <div class="container">
 
-  <div class="search-box">
-    <h2>학생 찾기</h2>
+  <!-- ==================== 첫 화면 ==================== -->
 
-    <input id="classInput" type="text" placeholder="반 예: 1-7">
-    <input id="numberInput" type="number" placeholder="번호">
+  <div id="homePage">
 
-    <button onclick="searchStudent()">조회</button>
+    <div class="home-title">
+      생기부 AI 작성 도우미
+    </div>
 
-    <div id="status"></div>
+    <div class="home-subtitle">
+      학생의 성찰 설문을 바탕으로 생활기록부 기록을 작성합니다.
+    </div>
+
+    <div class="menu-grid">
+
+      <div class="menu-card" onclick="showPage('setukPage')">
+        <div class="menu-icon">📚</div>
+        <div class="menu-title">세특</div>
+        <div class="menu-description">
+          수업성찰을 바탕으로 세부능력 및 특기사항 작성
+        </div>
+      </div>
+
+      <div class="menu-card" onclick="showPage('haengbalPage')">
+        <div class="menu-icon">🌱</div>
+        <div class="menu-title">행발</div>
+        <div class="menu-description">
+          학교생활 성찰을 바탕으로 행동특성 및 종합의견 작성
+        </div>
+      </div>
+
+      <div class="menu-card" onclick="showPage('careerPage')">
+        <div class="menu-icon">🎯</div>
+        <div class="menu-title">진로</div>
+        <div class="menu-description">
+          진로 성찰 설문을 바탕으로 진로 관련 기록 작성
+        </div>
+      </div>
+
+      <div class="menu-card" onclick="showPage('creativePage')">
+        <div class="menu-icon">⭐</div>
+        <div class="menu-title">창체</div>
+        <div class="menu-description">
+          창의적 체험활동 성찰을 바탕으로 기록 작성
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
-  <div id="studentArea"></div>
+
+  <!-- ==================== 세특 ==================== -->
+
+  <div id="setukPage" class="page">
+
+    <button class="back-button" onclick="showPage('homePage')">
+      ← 처음으로
+    </button>
+
+    <div class="search-box">
+
+      <h2>학생 수업성찰 기록</h2>
+
+      <input
+        id="classInput"
+        type="text"
+        placeholder="반 예: 1-7"
+      >
+
+      <input
+        id="numberInput"
+        type="number"
+        placeholder="번호"
+      >
+
+      <button onclick="searchStudent()">조회</button>
+
+      <div id="status"></div>
+
+    </div>
+
+    <div id="studentArea"></div>
+
+  </div>
+
+
+  <!-- ==================== 행발 ==================== -->
+
+  <div id="haengbalPage" class="page">
+
+    <button class="back-button" onclick="showPage('homePage')">
+      ← 처음으로
+    </button>
+
+    <div class="coming-soon">
+
+      <h2>🌱 행발</h2>
+
+      <p>
+        학교생활 성찰 설문을 바탕으로<br>
+        행동특성 및 종합의견을 작성합니다.
+      </p>
+
+      <p>
+        행발 설문 데이터 연결을 준비하고 있습니다.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================== 진로 ==================== -->
+
+  <div id="careerPage" class="page">
+
+    <button class="back-button" onclick="showPage('homePage')">
+      ← 처음으로
+    </button>
+
+    <div class="coming-soon">
+
+      <h2>🎯 진로</h2>
+
+      <p>
+        진로 성찰 설문을 바탕으로<br>
+        진로 관련 생활기록부 기록을 작성합니다.
+      </p>
+
+      <p>
+        준비 중입니다.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==================== 창체 ==================== -->
+
+  <div id="creativePage" class="page">
+
+    <button class="back-button" onclick="showPage('homePage')">
+      ← 처음으로
+    </button>
+
+    <div class="coming-soon">
+
+      <h2>⭐ 창체</h2>
+
+      <p>
+        창의적 체험활동 성찰 설문을 바탕으로<br>
+        생활기록부 기록을 작성합니다.
+      </p>
+
+      <p>
+        준비 중입니다.
+      </p>
+
+    </div>
+
+  </div>
 
 </div>
+
 
 <script>
 
@@ -112,6 +340,28 @@ const API_URL =
 
 let allData = [];
 
+
+/* =========================
+   페이지 이동
+========================= */
+
+function showPage(pageId) {
+
+  document.querySelectorAll(".page").forEach(page => {
+    page.style.display = "none";
+  });
+
+  document.getElementById("homePage").style.display = "none";
+
+  document.getElementById(pageId).style.display = "block";
+
+  window.scrollTo(0, 0);
+}
+
+
+/* =========================
+   학생 데이터 불러오기
+========================= */
 
 async function loadData() {
 
@@ -142,6 +392,10 @@ async function loadData() {
   }
 }
 
+
+/* =========================
+   학생 조회
+========================= */
 
 function searchStudent() {
 
@@ -174,41 +428,57 @@ function searchStudent() {
     "<div class='student-title'>" +
     studentKey +
     " 학생의 수업성찰 기록</div>";
-html += `
-  <button onclick="generateStudentRecord()" style="
-    margin-bottom:20px;
-    background:#16a34a;
-  ">
-    ✨ 생기부 표현 만들기
-  </button>
 
-  <div id="aiResult" class="card" style="display:none;"></div>
-`;
+  html += `
+    <button onclick="generateStudentRecord()" style="
+      margin-bottom:20px;
+      background:#16a34a;
+    ">
+      ✨ 생기부 표현 만들기
+    </button>
+
+    <div id="aiResult" class="card" style="display:none;"></div>
+  `;
+
+
   records.forEach(record => {
-const date = new Date(record["타임스탬프"]);
-const formattedDate =
-  date.getFullYear() + ". " +
-  (date.getMonth() + 1) + ". " +
-  date.getDate() + ".";
+
+    const date = new Date(record["타임스탬프"]);
+
+    const formattedDate =
+      date.getFullYear() + ". " +
+      (date.getMonth() + 1) + ". " +
+      date.getDate() + ".";
+
     html += `
       <div class="card">
 
-        <h3>${record["오늘 수업의 주제 또는 활동은 무엇이었나요?"] || ""}</h3>
+        <h3>
+          ${record["오늘 수업의 주제 또는 활동은 무엇이었나요?"] || ""}
+        </h3>
 
         <div class="label">수업일</div>
-<div>${formattedDate}</div>
+        <div>${formattedDate}</div>
 
         <div class="label">내가 한 일</div>
-        <div>${record["오늘 수업에서 내가 한 활동은 무엇인가요?"] || ""}</div>
+        <div>
+          ${record["오늘 수업에서 내가 한 활동은 무엇인가요?"] || ""}
+        </div>
 
         <div class="label">배운 점</div>
-        <div>${record["오늘 활동을 통해 새롭게 알게 되거나 이해하게 된 점은 무엇인가요?( 예: 자료를 찾아보면서 같은 문제도 여러 가지 해결 방법이 있다는 것을 알게 되었다.)"] || ""}</div>
+        <div>
+          ${record["오늘 활동을 통해 새롭게 알게 되거나 이해하게 된 점은 무엇인가요?( 예: 자료를 찾아보면서 같은 문제도 여러 가지 해결 방법이 있다는 것을 알게 되었다.)"] || ""}
+        </div>
 
         <div class="label">어려움·해결</div>
-        <div>${record["오늘 활동에서 어려웠던 점이나 잘 해결되지 않았던 점이 있었다면, 어떻게 해결했나요?(예: 자료를 찾는 데 어려움이 있었지만 검색어를 바꿔서 관련 자료를 찾았다.)"] || ""}</div>
+        <div>
+          ${record["오늘 활동에서 어려웠던 점이나 잘 해결되지 않았던 점이 있었다면, 어떻게 해결했나요?(예: 자료를 찾는 데 어려움이 있었지만 검색어를 바꿔서 관련 자료를 찾았다.)"] || ""}
+        </div>
 
         <div class="label">나의 기여</div>
-        <div>${record["오늘 모둠·짝 활동에서 내가 한 기여는 무엇인가요? (여러 개 선택 가능)"] || ""}</div>
+        <div>
+          ${record["오늘 모둠·짝 활동에서 내가 한 기여는 무엇인가요? (여러 개 선택 가능)"] || ""}
+        </div>
 
       </div>
     `;
@@ -217,12 +487,21 @@ const formattedDate =
   area.innerHTML = html;
 }
 
+
+/* =========================
+   AI 세특 생성
+========================= */
+
 async function generateStudentRecord() {
 
-  const resultArea = document.getElementById("aiResult");
+  const resultArea =
+    document.getElementById("aiResult");
 
   resultArea.style.display = "block";
-  resultArea.innerHTML = "✨ 생기부 표현을 만드는 중입니다...";
+
+  resultArea.innerHTML =
+    "✨ 생기부 표현을 만드는 중입니다...";
+
 
   const className =
     document.getElementById("classInput").value.trim();
@@ -233,41 +512,69 @@ async function generateStudentRecord() {
   const studentKey =
     className + "-" + number;
 
+
   const records = allData.filter(row => {
+
     return String(row["검색키"]).trim() === studentKey;
+
   });
 
+
   if (records.length === 0) {
-    resultArea.innerHTML = "학생 기록이 없습니다.";
+
+    resultArea.innerHTML =
+      "학생 기록이 없습니다.";
+
     return;
   }
+
 
   try {
 
     const response = await fetch("/api/generate", {
+
       method: "POST",
+
       headers: {
         "Content-Type": "application/json"
       },
+
       body: JSON.stringify({
         records: records
       })
+
     });
+
 
     const data = await response.json();
 
+
     if (!data.success) {
-      throw new Error(data.message || "AI 생성에 실패했습니다.");
+
+      throw new Error(
+        data.message ||
+        "AI 생성에 실패했습니다."
+      );
+
     }
 
+
     resultArea.innerHTML = `
-      <div class="label">✨ AI 생기부 표현</div>
+
+      <div class="label">
+        ✨ AI 생기부 표현
+      </div>
+
       <div style="
         line-height:1.8;
         margin-top:10px;
         white-space:pre-wrap;
-      ">${data.result}</div>
+      ">
+        ${data.result}
+      </div>
+
     `;
+
 
   } catch (error) {
 
@@ -276,8 +583,16 @@ async function generateStudentRecord() {
     resultArea.innerHTML =
       "AI 생기부 표현을 만드는 중 오류가 발생했습니다.<br>" +
       error.message;
+
   }
+
 }
+
+
+/* =========================
+   시작
+========================= */
+
 loadData();
 
 </script>

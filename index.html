@@ -384,6 +384,68 @@ let haengbalData = [];
 
 
 /* =========================
+   날짜 표시 함수
+   한국어 타임스탬프도 안전하게 처리
+========================= */
+
+function formatDate(value) {
+
+  const raw =
+    String(value || "").trim();
+
+  if (!raw) return "";
+
+  /*
+    예:
+    2026. 8. 13 오전 4:17:15
+
+    여기서 날짜 부분만 추출
+  */
+
+  const match =
+    raw.match(
+      /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/
+    );
+
+  if (match) {
+
+    return (
+      match[1] +
+      ". " +
+      match[2] +
+      ". " +
+      match[3] +
+      "."
+    );
+
+  }
+
+  /*
+    혹시 일반 날짜 형식이면
+    기존 방식으로 처리
+  */
+
+  const date =
+    new Date(raw);
+
+  if (!isNaN(date.getTime())) {
+
+    return (
+      date.getFullYear() +
+      ". " +
+      (date.getMonth() + 1) +
+      ". " +
+      date.getDate() +
+      "."
+    );
+
+  }
+
+  return raw;
+}
+
+
+/* =========================
    페이지 이동
 ========================= */
 
@@ -500,13 +562,8 @@ function searchStudent() {
 
   records.forEach(record => {
 
-    const date =
-      new Date(record["타임스탬프"]);
-
     const formattedDate =
-      date.getFullYear() + ". " +
-      (date.getMonth() + 1) + ". " +
-      date.getDate() + ".";
+      formatDate(record["타임스탬프"]);
 
     html += `
       <div class="card">
@@ -599,10 +656,12 @@ async function generateStudentRecord() {
 
 
     if (!data.success) {
+
       throw new Error(
         data.message ||
         "AI 생성에 실패했습니다."
       );
+
     }
 
 
@@ -829,13 +888,22 @@ function showHaengbalStudent() {
 
   records.forEach((record, index) => {
 
-    const date =
-      new Date(record["타임스탬프"]);
-
     const formattedDate =
-      date.getFullYear() + ". " +
-      (date.getMonth() + 1) + ". " +
-      date.getDate() + ".";
+      formatDate(record["타임스탬프"]);
+
+
+    /*
+      실제 구글 설문 응답의 열 제목에는
+      앞뒤 공백이 있을 수 있으므로
+      정확한 제목을 먼저 사용하고,
+      혹시 공백 없는 제목으로 들어온 경우도
+      대비함.
+    */
+
+    const friendRelation =
+      record["학급이나 학교에서 친구들과 어떻게 지냈나요?"] ||
+      record["  학급이나 학교에서 친구들과 어떻게 지냈나요?  "] ||
+      "";
 
 
     html += `
@@ -846,12 +914,18 @@ function showHaengbalStudent() {
           학교생활 성찰 ${index + 1}
         </h3>
 
-        <div class="label">작성일</div>
-        <div>${formattedDate}</div>
+        <div class="label">
+          작성일
+        </div>
+
+        <div>
+          ${formattedDate}
+        </div>
 
         <div class="label">
           책임감·자기관리
         </div>
+
         <div>
           ${record["  요즘 학교에서 나는 어떻게 지내나요?  "] || ""}
         </div>
@@ -859,6 +933,7 @@ function showHaengbalStudent() {
         <div class="label">
           자기주도·성장
         </div>
+
         <div>
           ${record["  스스로 계획하거나 노력한 일이 있나요?  "] || ""}
         </div>
@@ -866,6 +941,7 @@ function showHaengbalStudent() {
         <div class="label">
           배려·소통
         </div>
+
         <div>
           ${record["  친구들과 지내면서 어떤 모습을 보였나요?  "] || ""}
         </div>
@@ -873,13 +949,15 @@ function showHaengbalStudent() {
         <div class="label">
           친구 관계
         </div>
+
         <div>
-          ${record["학급이나 학교에서 친구들과 어떻게 지냈나요?"] || ""}
+          ${friendRelation}
         </div>
 
         <div class="label">
           기억에 남는 일
         </div>
+
         <div>
           ${record["요즘 학교생활에서 가장 기억에 남는 일이 있다면 적어주세요\n설명:\n친구와 있었던 일, 내가 노력한 일, 어려움을 해결한 일, 뿌듯했던 일 등 자유롭게 적어주세요."] || ""}
         </div>
@@ -887,6 +965,7 @@ function showHaengbalStudent() {
         <div class="label">
           선생님께 하고 싶은 말
         </div>
+
         <div>
           ${record["학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요?\n설명:\n나의 학교생활, 친구 관계, 고민, 변화, 잘하고 있는 점 등 선생님께 이야기하고 싶은 내용을 자유롭게 적어주세요."] || ""}
         </div>

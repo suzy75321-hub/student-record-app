@@ -176,14 +176,18 @@ function searchStudent() {
     " 학생의 수업성찰 기록</div>";
 
   records.forEach(record => {
-
+const date = new Date(record["타임스탬프"]);
+const formattedDate =
+  date.getFullYear() + ". " +
+  (date.getMonth() + 1) + ". " +
+  date.getDate() + ".";
     html += `
       <div class="card">
 
         <h3>${record["오늘 수업의 주제 또는 활동은 무엇이었나요?"] || ""}</h3>
 
         <div class="label">수업일</div>
-        <div>${record["타임스탬프"] || ""}</div>
+<div>${formattedDate}</div>
 
         <div class="label">내가 한 일</div>
         <div>${record["오늘 수업에서 내가 한 활동은 무엇인가요?"] || ""}</div>

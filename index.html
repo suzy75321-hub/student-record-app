@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학생 기록 앱</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f6f8;
+  color: #222;
+}
+
+header {
+  background: #2f5bea;
+  color: white;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.search-box {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+input, button {
+  padding: 12px;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+button {
+  background: #2f5bea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.student-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: #2f5bea;
+}
+
+.label {
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+#status {
+  margin-top: 15px;
+  color: #555;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+학생 수업성찰 기록
+</header>
+
+<div class="container">
+
+  <div class="search-box">
+    <h2>학생 찾기</h2>
+
+    <input id="classInput" type="text" placeholder="반 예: 1-7">
+    <input id="numberInput" type="number" placeholder="번호">
+
+    <button onclick="searchStudent()">조회</button>
+
+    <div id="status"></div>
+  </div>
+
+  <div id="studentArea"></div>
+
+</div>
+
+<script>
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbx29VbzFJifdQdNVB54gJvev4y-1iNfmwte34n5Pj4QAbfmbakeDV4CazSZV57lHp5uyQ/exec";
+
+let allData = [];
+
+
+async function loadData() {
+
+  document.getElementById("status").textContent =
+    "학생 기록을 불러오는 중입니다...";
+
+  try {
+
+    const response = await fetch(API_URL);
+
+    const json = await response.json();
+
+    if (!json.success) {
+      throw new Error(json.message);
+    }
+
+    allData = json.data;
+
+    document.getElementById("status").textContent =
+      "전체 기록 " + allData.length + "건을 불러왔습니다.";
+
+  } catch (error) {
+
+    document.getElementById("status").textContent =
+      "데이터를 불러오지 못했습니다.";
+
+    console.error(error);
+  }
+}
+
+
+function searchStudent() {
+
+  const className =
+    document.getElementById("classInput").value.trim();
+
+  const number =
+    document.getElementById("numberInput").value.trim();
+
+  const studentKey =
+    className + "-" + number;
+
+  const records = allData.filter(row => {
+
+    return String(row["학생키"]).trim() === studentKey;
+
+  });
+
+  const area = document.getElementById("studentArea");
+
+  if (records.length === 0) {
+
+    area.innerHTML =
+      "<div class='card'>해당 학생의 기록이 없습니다.</div>";
+
+    return;
+  }
+
+  let html =
+    "<div class='student-title'>" +
+    studentKey +
+    " 학생의 수업성찰 기록</div>";
+
+  records.forEach(record => {
+
+    html += `
+      <div class="card">
+
+        <h3>${record["오늘 수업의 주제 또는 활동은 무엇이었나요?"] || ""}</h3>
+
+        <div class="label">수업일</div>
+        <div>${record["타임스탬프"] || ""}</div>
+
+        <div class="label">내가 한 일</div>
+        <div>${record["오늘 수업에서 내가 한 활동은 무엇인가요?"] || ""}</div>
+
+        <div class="label">배운 점</div>
+        <div>${record["오늘 활동을 통해 새롭게 알게 되거나 이해하게 된 점은 무엇인가요?( 예: 자료를 찾아보면서 같은 문제도 여러 가지 해결 방법이 있다는 것을 알게 되었다.)"] || ""}</div>
+
+        <div class="label">어려움·해결</div>
+        <div>${record["오늘 활동에서 어려웠던 점이나 잘 해결되지 않았던 점이 있었다면, 어떻게 해결했나요?(예: 자료를 찾는 데 어려움이 있었지만 검색어를 바꿔서 관련 자료를 찾았다.)"] || ""}</div>
+
+        <div class="label">나의 기여</div>
+        <div>${record["오늘 모둠·짝 활동에서 내가 한 기여는 무엇인가요? (여러 개 선택 가능)"] || ""}</div>
+
+      </div>
+    `;
+  });
+
+  area.innerHTML = html;
+}
+
+
+loadData();
+
+</script>
+
+</body>
+</html>

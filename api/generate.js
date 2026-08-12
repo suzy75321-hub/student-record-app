@@ -86,13 +86,41 @@ ${recordText}
       });
     }
 
-    const result =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let result =
+  data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    return res.status(200).json({
-      success: true,
-      result: result.trim()
-    });
+result = result.trim();
+
+// UTF-8 기준 1000바이트 제한
+function cutTo1000Bytes(text) {
+  let result = "";
+
+  for (const char of text) {
+    const test = result + char;
+
+    if (new TextEncoder().encode(test).length > 1000) {
+      break;
+    }
+
+    result = test;
+  }
+
+  // 문장 중간에서 끊기지 않도록 마지막 마침표까지 정리
+  const lastPeriod = result.lastIndexOf(".");
+
+  if (lastPeriod > 0) {
+    result = result.substring(0, lastPeriod + 1);
+  }
+
+  return result.trim();
+}
+
+result = cutTo1000Bytes(result);
+
+return res.status(200).json({
+  success: true,
+  result: result
+});
 
   } catch (error) {
     return res.status(500).json({

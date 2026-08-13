@@ -2,10 +2,16 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>생기부 AI 작성 도우미</title>
+
 
 <style>
 
@@ -164,7 +170,14 @@ button:hover {
   display: none;
   line-height: 1.8;
   white-space: pre-wrap;
-  border-left: 5px solid #16a34a;
+}
+
+.loading {
+  color: #666;
+}
+
+.error {
+  color: #dc2626;
 }
 
 @media (max-width: 600px) {
@@ -173,9 +186,19 @@ button:hover {
     grid-template-columns: 1fr;
   }
 
+  input,
+  select,
+  button {
+    width: 100%;
+    margin-bottom: 10px;
+    margin-right: 0;
+    box-sizing: border-box;
+  }
+
 }
 
 </style>
+
 </head>
 
 
@@ -190,9 +213,9 @@ button:hover {
 <div class="container">
 
 
-<!-- ==================================================
-     첫 화면
-================================================== -->
+<!-- =====================================================
+     홈
+===================================================== -->
 
 <div id="homePage">
 
@@ -293,15 +316,11 @@ button:hover {
 </div>
 
 
-
-<!-- ==================================================
+<!-- =====================================================
      세특
-================================================== -->
+===================================================== -->
 
-<div
-  id="setukPage"
-  class="page"
->
+<div id="setukPage" class="page">
 
 
   <button
@@ -333,9 +352,7 @@ button:hover {
     >
 
 
-    <button
-      onclick="searchStudent()"
-    >
+    <button onclick="searchStudent()">
       조회
     </button>
 
@@ -347,19 +364,14 @@ button:hover {
 
   <div id="studentArea"></div>
 
-
 </div>
 
 
-
-<!-- ==================================================
+<!-- =====================================================
      행발
-================================================== -->
+===================================================== -->
 
-<div
-  id="haengbalPage"
-  class="page"
->
+<div id="haengbalPage" class="page">
 
 
   <button
@@ -389,41 +401,25 @@ button:hover {
     >
 
       <option value="">
-        학생을 선택하세요
+        학생 목록을 불러오는 중...
       </option>
 
     </select>
 
 
-    <div
-      id="haengbalStatus"
-      style="
-        margin-top:10px;
-        color:#666;
-      "
-    ></div>
-
-
   </div>
 
 
-  <div
-    id="haengbalStudentArea"
-  ></div>
-
+  <div id="haengbalStudentArea"></div>
 
 </div>
 
 
-
-<!-- ==================================================
+<!-- =====================================================
      진로
-================================================== -->
+===================================================== -->
 
-<div
-  id="careerPage"
-  class="page"
->
+<div id="careerPage" class="page">
 
 
   <button
@@ -453,19 +449,14 @@ button:hover {
 
   </div>
 
-
 </div>
 
 
-
-<!-- ==================================================
+<!-- =====================================================
      창체
-================================================== -->
+===================================================== -->
 
-<div
-  id="creativePage"
-  class="page"
->
+<div id="creativePage" class="page">
 
 
   <button
@@ -495,20 +486,18 @@ button:hover {
 
   </div>
 
-
 </div>
 
 
 </div>
-
 
 
 <script>
 
 
-/* ==================================================
+/* =====================================================
    API 주소
-================================================== */
+===================================================== */
 
 
 /* 세특 API */
@@ -523,17 +512,14 @@ const HAENGBAL_API_URL =
 "https://script.google.com/macros/s/AKfycbynhrkaaqu-CYzncBBqga3NG0_s7yoid8kenAmzccSO_gqQS92Nop9ZMmZFsyu1vapw/exec";
 
 
-/* 데이터 */
-
 let allData = [];
 
 let haengbalData = [];
 
 
-
-/* ==================================================
+/* =====================================================
    페이지 이동
-================================================== */
+===================================================== */
 
 function showPage(pageId) {
 
@@ -542,30 +528,26 @@ function showPage(pageId) {
     .querySelectorAll(".page")
     .forEach(page => {
 
-      page.style.display =
-        "none";
+      page.style.display = "none";
 
     });
 
 
   document
     .getElementById("homePage")
-    .style.display =
-    "none";
+    .style.display = "none";
 
 
   document
     .getElementById(pageId)
-    .style.display =
-    "block";
+    .style.display = "block";
 
 
   if (
-    pageId ===
-    "haengbalPage"
+    pageId === "haengbalPage"
   ) {
 
-    makeHaengbalStudentList();
+    loadHaengbalData();
 
   }
 
@@ -578,10 +560,9 @@ function showPage(pageId) {
 }
 
 
-
-/* ==================================================
-   세특 데이터 불러오기
-================================================== */
+/* =====================================================
+   세특 데이터
+===================================================== */
 
 async function loadData() {
 
@@ -603,23 +584,39 @@ async function loadData() {
       await fetch(API_URL);
 
 
-    const json =
-      await response.json();
+    const text =
+      await response.text();
+
+
+    let json;
+
+
+    try {
+
+      json =
+        JSON.parse(text);
+
+    } catch (error) {
+
+      throw new Error(
+        "세특 API가 JSON을 반환하지 않았습니다."
+      );
+
+    }
 
 
     if (!json.success) {
 
       throw new Error(
-        json.message
+        json.message ||
+        "세특 데이터를 불러오지 못했습니다."
       );
 
     }
 
 
     allData =
-      Array.isArray(json.data)
-        ? json.data
-        : [];
+      json.data || [];
 
 
     status.textContent =
@@ -628,9 +625,7 @@ async function loadData() {
       "건을 불러왔습니다.";
 
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
 
     console.error(
@@ -640,18 +635,17 @@ async function loadData() {
 
 
     status.textContent =
-      "데이터를 불러오지 못했습니다.";
-
+      "데이터를 불러오지 못했습니다. " +
+      error.message;
 
   }
 
 }
 
 
-
-/* ==================================================
+/* =====================================================
    세특 학생 조회
-================================================== */
+===================================================== */
 
 function searchStudent() {
 
@@ -700,24 +694,23 @@ function searchStudent() {
     records.length === 0
   ) {
 
-
     area.innerHTML =
-      "<div class='card'>해당 학생의 기록이 없습니다.</div>";
-
+      `
+      <div class="card">
+        해당 학생의 기록이 없습니다.
+      </div>
+      `;
 
     return;
 
   }
 
 
-
   let html = `
 
     <div class="student-title">
-
       ${studentKey}
       학생의 수업성찰 기록
-
     </div>
 
 
@@ -725,9 +718,7 @@ function searchStudent() {
       class="ai-button"
       onclick="generateStudentRecord()"
     >
-
       ✨ 생기부 표현 만들기
-
     </button>
 
 
@@ -739,27 +730,14 @@ function searchStudent() {
   `;
 
 
-
   records.forEach(
     record => {
-
-
-      /*
-        날짜는 API에서 이미
-        "2026. 8. 13."
-        형태의 문자열로 변환되어
-        오므로 다시 날짜 변환하지 않는다.
-      */
-
-      const displayDate =
-        String(
-          record["타임스탬프"] || ""
-        );
 
 
       html += `
 
         <div class="card">
+
 
           <h3>
             ${
@@ -775,7 +753,9 @@ function searchStudent() {
           </div>
 
           <div>
-            ${displayDate}
+            ${
+              record["타임스탬프"] || ""
+            }
           </div>
 
 
@@ -845,10 +825,9 @@ function searchStudent() {
 }
 
 
-
-/* ==================================================
+/* =====================================================
    세특 AI
-================================================== */
+===================================================== */
 
 async function generateStudentRecord() {
 
@@ -909,8 +888,7 @@ async function generateStudentRecord() {
         "/api/generate",
         {
 
-          method:
-            "POST",
+          method: "POST",
 
           headers: {
             "Content-Type":
@@ -927,8 +905,37 @@ async function generateStudentRecord() {
       );
 
 
-    const data =
-      await response.json();
+    const responseText =
+      await response.text();
+
+
+    let data;
+
+
+    try {
+
+      data =
+        JSON.parse(
+          responseText
+        );
+
+    } catch (error) {
+
+      throw new Error(
+        "AI 서버가 정상적인 JSON을 반환하지 않았습니다."
+      );
+
+    }
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.message ||
+        "AI 서버 오류가 발생했습니다."
+      );
+
+    }
 
 
     if (!data.success) {
@@ -955,62 +962,64 @@ async function generateStudentRecord() {
           white-space:pre-wrap;
         "
       >
-
-        ${data.result}
-
+        ${data.result || ""}
       </div>
 
     `;
 
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
 
     console.error(
+      "세특 AI 오류:",
       error
     );
 
 
     resultArea.innerHTML =
-      "AI 생기부 표현을 만드는 중 오류가 발생했습니다.<br>" +
-      error.message;
+      `
+      <div class="error">
+        AI 생기부 표현을 만드는 중
+        오류가 발생했습니다.
+        <br><br>
+        ${error.message}
+      </div>
+      `;
 
   }
 
 }
 
 
-
-/* ==================================================
+/* =====================================================
    행발 데이터 불러오기
-================================================== */
+===================================================== */
 
 async function loadHaengbalData() {
 
 
-  const status =
+  const select =
     document.getElementById(
-      "haengbalStatus"
+      "haengbalStudentSelect"
+    );
+
+
+  const area =
+    document.getElementById(
+      "haengbalStudentArea"
     );
 
 
   try {
 
 
-    if (status) {
-
-      status.textContent =
-        "행발 학생 목록을 불러오는 중입니다...";
-
-    }
-
-
-    console.log(
-      "행발 API 호출:",
-      HAENGBAL_API_URL
-    );
+    select.innerHTML =
+      `
+      <option value="">
+        학생 목록을 불러오는 중...
+      </option>
+      `;
 
 
     const response =
@@ -1019,23 +1028,13 @@ async function loadHaengbalData() {
       );
 
 
-    /*
-      먼저 text로 받는다.
-      서버 오류 HTML이 와도
-      JSON.parse 오류를 정확히
-      잡을 수 있다.
-    */
-
     const text =
       await response.text();
 
 
     console.log(
-      "행발 API 응답:",
-      text.substring(
-        0,
-        500
-      )
+      "행발 API 원본:",
+      text
     );
 
 
@@ -1047,12 +1046,10 @@ async function loadHaengbalData() {
       json =
         JSON.parse(text);
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
       throw new Error(
-        "행발 API가 JSON 데이터를 반환하지 않았습니다."
+        "행발 API가 JSON을 반환하지 않았습니다."
       );
 
     }
@@ -1082,28 +1079,10 @@ async function loadHaengbalData() {
     );
 
 
-    console.log(
-      "행발 데이터 개수:",
-      haengbalData.length
-    );
-
-
-    if (status) {
-
-      status.textContent =
-        "학생 " +
-        getUniqueStudentCount() +
-        "명의 기록을 불러왔습니다.";
-
-    }
-
-
     makeHaengbalStudentList();
 
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
 
     console.error(
@@ -1112,67 +1091,32 @@ async function loadHaengbalData() {
     );
 
 
-    haengbalData =
-      [];
+    select.innerHTML =
+      `
+      <option value="">
+        학생 목록을 불러오지 못했습니다.
+      </option>
+      `;
 
 
-    if (status) {
-
-      status.textContent =
-        "행발 데이터를 불러오지 못했습니다: " +
-        error.message;
-
-    }
-
+    area.innerHTML =
+      `
+      <div class="card error">
+        행발 데이터를 불러오는 중
+        오류가 발생했습니다.
+        <br><br>
+        ${error.message}
+      </div>
+      `;
 
   }
 
 }
 
 
-
-/* ==================================================
-   행발 학생 수
-================================================== */
-
-function getUniqueStudentCount() {
-
-
-  const students =
-    new Set();
-
-
-  haengbalData.forEach(
-    row => {
-
-
-      const number =
-        String(
-          row["학번"] ?? ""
-        ).trim();
-
-
-      if (number) {
-
-        students.add(
-          number
-        );
-
-      }
-
-    }
-  );
-
-
-  return students.size;
-
-}
-
-
-
-/* ==================================================
+/* =====================================================
    행발 학생 목록
-================================================== */
+===================================================== */
 
 function makeHaengbalStudentList() {
 
@@ -1184,63 +1128,46 @@ function makeHaengbalStudentList() {
 
 
   if (!select) {
-
     return;
-
   }
 
 
   select.innerHTML =
     `
-      <option value="">
-        학생을 선택하세요
-      </option>
+    <option value="">
+      학생을 선택하세요
+    </option>
     `;
 
 
-  if (
-    !Array.isArray(
-      haengbalData
-    ) ||
-    haengbalData.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  const students =
-    {};
+  const students = {};
 
 
   haengbalData.forEach(
     row => {
 
 
-      const number =
+      const studentNumber =
         String(
           row["학번"] ?? ""
         ).trim();
 
 
-      const name =
+      const studentName =
         String(
           row["이름"] ?? ""
         ).trim();
 
 
-      console.log(
-        "학생 확인:",
-        number,
-        name
-      );
+      if (
+        studentNumber &&
+        studentName
+      ) {
 
-
-      if (number) {
-
-        students[number] =
-          name;
+        students[
+          studentNumber
+        ] =
+          studentName;
 
       }
 
@@ -1248,65 +1175,16 @@ function makeHaengbalStudentList() {
   );
 
 
-
   const sortedNumbers =
     Object.keys(
       students
     ).sort(
-      (a, b) => {
-
-
-        const aa =
-          a
-            .split("-")
-            .map(Number);
-
-
-        const bb =
-          b
-            .split("-")
-            .map(Number);
-
-
-        for (
-          let i = 0;
-          i <
-          Math.max(
-            aa.length,
-            bb.length
-          );
-          i++
-        ) {
-
-
-          const av =
-            aa[i] ?? 0;
-
-
-          const bv =
-            bb[i] ?? 0;
-
-
-          if (
-            av !== bv
-          ) {
-
-            return av - bv;
-
-          }
-
-        }
-
-
-        return 0;
-
-      }
+      compareStudentNumber
     );
 
 
-
   sortedNumbers.forEach(
-    number => {
+    studentNumber => {
 
 
       const option =
@@ -1316,16 +1194,15 @@ function makeHaengbalStudentList() {
 
 
       option.value =
-        number;
+        studentNumber;
 
 
       option.textContent =
-        number +
+        studentNumber +
         " " +
-        (
-          students[number] ||
-          ""
-        );
+        students[
+          studentNumber
+        ];
 
 
       select.appendChild(
@@ -1335,23 +1212,91 @@ function makeHaengbalStudentList() {
     }
   );
 
+
+  console.log(
+    "행발 학생 목록:",
+    students
+  );
+
 }
 
 
+/* =====================================================
+   학번 정렬
+===================================================== */
 
-/* ==================================================
-   행발 학생 기록 표시
-================================================== */
+function compareStudentNumber(
+  a,
+  b
+) {
+
+
+  const aa =
+    a
+      .split("-")
+      .map(Number);
+
+
+  const bb =
+    b
+      .split("-")
+      .map(Number);
+
+
+  for (
+    let i = 0;
+    i <
+    Math.max(
+      aa.length,
+      bb.length
+    );
+    i++
+  ) {
+
+
+    const av =
+      Number.isNaN(
+        aa[i]
+      )
+        ? 0
+        : aa[i];
+
+
+    const bv =
+      Number.isNaN(
+        bb[i]
+      )
+        ? 0
+        : bb[i];
+
+
+    if (
+      av !== bv
+    ) {
+
+      return av - bv;
+
+    }
+
+  }
+
+
+  return 0;
+
+}
+
+
+/* =====================================================
+   행발 학생 선택
+===================================================== */
 
 function showHaengbalStudent() {
 
 
-  const studentKey =
-    document
-      .getElementById(
-        "haengbalStudentSelect"
-      )
-      .value;
+  const select =
+    document.getElementById(
+      "haengbalStudentSelect"
+    );
 
 
   const area =
@@ -1360,15 +1305,18 @@ function showHaengbalStudent() {
     );
 
 
+  const studentKey =
+    String(
+      select.value || ""
+    ).trim();
+
+
+  area.innerHTML =
+    "";
+
+
   if (!studentKey) {
-
-
-    area.innerHTML =
-      "";
-
-
     return;
-
   }
 
 
@@ -1382,6 +1330,18 @@ function showHaengbalStudent() {
     );
 
 
+  console.log(
+    "선택 학생:",
+    studentKey
+  );
+
+
+  console.log(
+    "학생 기록:",
+    records
+  );
+
+
   if (
     records.length === 0
   ) {
@@ -1389,9 +1349,10 @@ function showHaengbalStudent() {
 
     area.innerHTML =
       `
-        <div class="card">
-          행발 기록이 없습니다.
-        </div>
+      <div class="card">
+        ${studentKey}
+        학생의 행발 기록이 없습니다.
+      </div>
       `;
 
 
@@ -1400,12 +1361,10 @@ function showHaengbalStudent() {
   }
 
 
-
   const name =
     String(
       records[0]["이름"] ?? ""
     ).trim();
-
 
 
   let html = `
@@ -1423,9 +1382,7 @@ function showHaengbalStudent() {
       class="ai-button"
       onclick="generateHaengbalRecord()"
     >
-
       ✨ AI 행발 표현 만들기
-
     </button>
 
 
@@ -1437,23 +1394,64 @@ function showHaengbalStudent() {
   `;
 
 
-
   records.forEach(
     (record, index) => {
 
 
-      /*
-        날짜는 API에서 이미
-        문자열로 변환되었으므로
-        여기서 절대 new Date()를
-        사용하지 않는다.
-      */
-
-      const displayDate =
+      const date =
         String(
-          record["타임스탬프"] ?? ""
-        );
+          record[
+            "타임스탬프"
+          ] ?? ""
+        ).trim();
 
+
+      const responsibility =
+        String(
+          record[
+            "책임감·자기관리"
+          ] ?? ""
+        ).trim();
+
+
+      const growth =
+        String(
+          record[
+            "자기주도·성장"
+          ] ?? ""
+        ).trim();
+
+
+      const communication =
+        String(
+          record[
+            "배려·소통"
+          ] ?? ""
+        ).trim();
+
+
+      const friendship =
+        String(
+          record[
+            "친구관계"
+          ] ?? ""
+        ).trim();
+
+
+      const memorable =
+        String(
+          record[
+            "기억에 남는 일"
+          ] ?? ""
+        ).trim();
+
+
+      const teacherMessage =
+        String(
+          record[
+            "선생님께 꼭 하고 싶은 말"
+          ] ?? ""
+        ).trim();
 
 
       html += `
@@ -1462,10 +1460,8 @@ function showHaengbalStudent() {
 
 
           <h3>
-
             학교생활 성찰
             ${index + 1}
-
           </h3>
 
 
@@ -1473,99 +1469,62 @@ function showHaengbalStudent() {
             작성일
           </div>
 
-
           <div>
-            ${displayDate}
+            ${date}
           </div>
-
 
 
           <div class="label">
             책임감·자기관리
           </div>
 
-
           <div>
-            ${
-              record[
-                "책임감·자기관리"
-              ] || ""
-            }
+            ${responsibility}
           </div>
-
 
 
           <div class="label">
             자기주도·성장
           </div>
 
-
           <div>
-            ${
-              record[
-                "자기주도·성장"
-              ] || ""
-            }
+            ${growth}
           </div>
-
 
 
           <div class="label">
             배려·소통
           </div>
 
-
           <div>
-            ${
-              record[
-                "배려·소통"
-              ] || ""
-            }
+            ${communication}
           </div>
-
 
 
           <div class="label">
             친구 관계
           </div>
 
-
           <div>
-            ${
-              record[
-                "친구관계"
-              ] || ""
-            }
+            ${friendship}
           </div>
-
 
 
           <div class="label">
             기억에 남는 일
           </div>
 
-
           <div>
-            ${
-              record[
-                "기억에 남는 일"
-              ] || ""
-            }
+            ${memorable}
           </div>
-
 
 
           <div class="label">
             선생님께 하고 싶은 말
           </div>
 
-
           <div>
-            ${
-              record[
-                "선생님께 꼭 하고 싶은 말"
-              ] || ""
-            }
+            ${teacherMessage}
           </div>
 
 
@@ -1577,17 +1536,15 @@ function showHaengbalStudent() {
   );
 
 
-
   area.innerHTML =
     html;
 
 }
 
 
-
-/* ==================================================
+/* =====================================================
    행발 AI
-================================================== */
+===================================================== */
 
 async function generateHaengbalRecord() {
 
@@ -1598,6 +1555,11 @@ async function generateHaengbalRecord() {
     );
 
 
+  if (!resultArea) {
+    return;
+  }
+
+
   resultArea.style.display =
     "block";
 
@@ -1606,12 +1568,28 @@ async function generateHaengbalRecord() {
     "✨ AI가 행발 표현을 만드는 중입니다...";
 
 
+  const select =
+    document.getElementById(
+      "haengbalStudentSelect"
+    );
+
+
   const studentKey =
-    document
-      .getElementById(
-        "haengbalStudentSelect"
-      )
-      .value;
+    String(
+      select.value || ""
+    ).trim();
+
+
+  if (!studentKey) {
+
+
+    resultArea.innerHTML =
+      "학생을 먼저 선택해주세요.";
+
+
+    return;
+
+  }
 
 
   const records =
@@ -1638,6 +1616,11 @@ async function generateHaengbalRecord() {
   }
 
 
+  console.log(
+    "AI에 전달할 행발 기록:",
+    records
+  );
+
 
   try {
 
@@ -1647,8 +1630,7 @@ async function generateHaengbalRecord() {
         "/api/generate-haengbal",
         {
 
-          method:
-            "POST",
+          method: "POST",
 
           headers: {
             "Content-Type":
@@ -1665,8 +1647,24 @@ async function generateHaengbalRecord() {
       );
 
 
-    const text =
+    /*
+     * JSON으로 바로 받지 않고
+     * text로 먼저 받는다.
+     *
+     * 서버에서
+     * A server error...
+     * 같은 문장이 와도
+     * Unexpected token 오류가 나지 않는다.
+     */
+
+    const responseText =
       await response.text();
+
+
+    console.log(
+      "행발 AI 서버 응답:",
+      responseText
+    );
 
 
     let data;
@@ -1675,11 +1673,11 @@ async function generateHaengbalRecord() {
     try {
 
       data =
-        JSON.parse(text);
+        JSON.parse(
+          responseText
+        );
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
       throw new Error(
         "AI 서버가 정상적인 JSON을 반환하지 않았습니다."
@@ -1688,7 +1686,21 @@ async function generateHaengbalRecord() {
     }
 
 
-    if (!data.success) {
+    if (
+      !response.ok
+    ) {
+
+      throw new Error(
+        data.message ||
+        "AI 서버 오류가 발생했습니다."
+      );
+
+    }
+
+
+    if (
+      !data.success
+    ) {
 
       throw new Error(
         data.message ||
@@ -1712,17 +1724,13 @@ async function generateHaengbalRecord() {
           white-space:pre-wrap;
         "
       >
-
-        ${data.result}
-
+        ${data.result || ""}
       </div>
 
     `;
 
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
 
     console.error(
@@ -1733,9 +1741,18 @@ async function generateHaengbalRecord() {
 
     resultArea.innerHTML =
       `
-        AI 행발 표현을 만드는 중 오류가 발생했습니다.
+
+      <div class="error">
+
+        AI 행발 표현을 만드는 중
+        오류가 발생했습니다.
+
         <br><br>
+
         ${error.message}
+
+      </div>
+
       `;
 
   }
@@ -1743,10 +1760,9 @@ async function generateHaengbalRecord() {
 }
 
 
-
-/* ==================================================
+/* =====================================================
    시작
-================================================== */
+===================================================== */
 
 loadData();
 

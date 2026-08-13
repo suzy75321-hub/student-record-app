@@ -1,4 +1,3 @@
-```javascript
 export default async function handler(req, res) {
 
   // =========================
@@ -22,12 +21,10 @@ export default async function handler(req, res) {
     const { records } = req.body || {};
 
     if (!Array.isArray(records) || records.length === 0) {
-
       return res.status(400).json({
         success: false,
         message: "학생 기록이 없습니다."
       });
-
     }
 
 
@@ -39,18 +36,15 @@ export default async function handler(req, res) {
       process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-
       return res.status(500).json({
         success: false,
-        message:
-          "GEMINI_API_KEY가 Vercel 환경변수에 없습니다."
+        message: "Gemini API 키가 설정되지 않았습니다."
       });
-
     }
 
 
     // =========================
-    // 학생 기록 정리
+    // 학생 학교생활 성찰 기록 정리
     // =========================
 
     const recordText =
@@ -85,7 +79,7 @@ ${record["학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요
 
 
     // =========================
-    // AI 프롬프트
+    // 행발 AI 프롬프트
     // =========================
 
     const prompt = `
@@ -93,7 +87,7 @@ ${record["학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요
 
 아래 학생의 여러 학교생활 성찰 기록을 종합하여
 학교생활기록부의 "행동특성 및 종합의견"에 활용할 수 있는
-교사 관찰자 관점의 문장을 작성하세요.
+문장을 작성하세요.
 
 규칙:
 
@@ -121,7 +115,7 @@ ${record["학교생활에 대해 선생님께 꼭 하고 싶은 말이 있나요
 
 10. 교사가 실제로 관찰하고 기록한 것처럼 자연스럽게 작성하세요.
 
-11. 결과만 출력하고 제목이나 설명은 출력하지 마세요.
+11. 결과만 출력하고 설명이나 제목은 출력하지 마세요.
 
 12. 생기부 문장에는 가운데점(·)을 사용하지 마세요.
 가운데점 대신 쉼표(,)를 사용하세요.
@@ -138,73 +132,37 @@ ${recordText}
     // Gemini API
     // =========================
 
-    const apiUrl =
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
-
-
-    const response =
-      await fetch(apiUrl, {
-
+    // ★ 세특에서 현재 정상 작동하는 구조와 동일하게 사용
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey,
+      {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
+          "Content-Type": "application/json"
         },
 
         body: JSON.stringify({
-
           contents: [
             {
-              role: "user",
-
               parts: [
                 {
                   text: prompt
                 }
               ]
             }
-          ],
-
-          generationConfig: {
-            maxOutputTokens: 1000
-          }
-
+          ]
         })
-
-      });
+      }
+    );
 
 
     // =========================
-    // Gemini 응답을 먼저 text로 받기
+    // Gemini 응답
     // =========================
 
-    const responseText =
-      await response.text();
-
-
-    let data;
-
-    try {
-
-      data =
-        JSON.parse(responseText);
-
-    } catch (parseError) {
-
-      return res.status(500).json({
-
-        success: false,
-
-        message:
-          "Gemini 응답을 읽을 수 없습니다.",
-
-        detail:
-          responseText.substring(0, 500)
-
-      });
-
-    }
+    const data =
+      await response.json();
 
 
     // =========================
@@ -214,13 +172,10 @@ ${recordText}
     if (!response.ok) {
 
       return res.status(500).json({
-
         success: false,
-
         message:
           data?.error?.message ||
           "Gemini API 호출에 실패했습니다."
-
       });
 
     }
@@ -231,30 +186,26 @@ ${recordText}
     // =========================
 
     let result =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "";
+      data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
 
     result =
-      String(result).trim();
+      result.trim();
 
 
     if (!result) {
 
       return res.status(500).json({
-
         success: false,
-
         message:
           "Gemini에서 생성된 결과가 없습니다."
-
       });
 
     }
 
 
     // =========================
-    // 1000바이트 제한
+    // UTF-8 기준 1000바이트 제한
     // =========================
 
     function cutTo1000Bytes(text) {
@@ -264,10 +215,12 @@ ${recordText}
       const encoder =
         new TextEncoder();
 
+
       for (const char of text) {
 
         const test =
           output + char;
+
 
         if (
           encoder.encode(test).length > 1000
@@ -275,13 +228,16 @@ ${recordText}
           break;
         }
 
+
         output =
           test;
 
       }
 
 
-      // 마지막 문장 마침표까지 자르기
+      // 문장 중간에서 끊기지 않도록
+      // 마지막 마침표까지 정리
+
       const lastPeriod =
         output.lastIndexOf(".");
 
@@ -340,4 +296,3 @@ ${recordText}
   }
 
 }
-```
